@@ -33,7 +33,7 @@
     </style>
 </head>
 <body>
-<div class="news-ticker"><div class="ticker-text" id="latest-booking">جاري تحديث البيانات المباشرة...</div></div>
+<div class="news-ticker"><div class="ticker-text" id="latest-booking">جاري سحب البيانات المباشرة الآن...</div></div>
 <div class="main-layout">
     <div class="sidebar">
         <h3>📅 جدول العيادات</h3>
@@ -42,7 +42,7 @@
     <div class="content-area">
         <div class="dashboard-container">
             <h2>📋 لوحة تحكم حجوزات مجمع شبراملس</h2>
-            <div style="text-align:center; margin-bottom:15px;" id="today-date"></div>
+            <div style="text-align:center; margin-bottom:15px; font-weight:bold;" id="today-date"></div>
             <div class="top-controls">
                 <div id="current-view-title" style="font-weight: bold; color: var(--primary-color);">عرض: الكل</div>
                 <div>
@@ -61,6 +61,7 @@
     </div>
 </div>
 <script>
+    // الرابط مع إضافة متغير لمنع التخزين المؤقت
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
     const schedule = { "السبت": ["أسنان", "مسالك", "أنف وأذن", "عيون"], "الأحد": ["قلب", "أسنان", "عيون", "عظام"], "الإثنين": ["نساء", "مخ وأعصاب", "أسنان"], "الثلاثاء": ["نفسية", "أسنان", "عظام"], "الأربعاء": ["أسنان", "قلب", "اطفال"], "الخميس": ["قلب", "أنف وأذن", "عظام"], "الجمعة": ["باطنة ومناظير"] };
 
@@ -95,7 +96,8 @@
         tbody.innerHTML = ""; document.getElementById('loader').style.display = "block";
 
         try {
-            const response = await fetch(SHEET_URL + "&cache=" + Date.now());
+            // إضافة t=timestamp للرابط لضمان عدم سحب بيانات قديمة
+            const response = await fetch(`${SHEET_URL}&t=${new Date().getTime()}`, { cache: "no-store" });
             const data = await response.text();
             const rows = data.split('\n').slice(1);
             document.getElementById('loader').style.display = "none";
@@ -105,7 +107,7 @@
                 const cols = row.split(',').map(c => c.trim().replace(/"/g, ''));
                 if (cols.length < 3) return;
 
-                const pName = cols[1], specialty = cols[2], doctor = cols[3], time = cols[0], sheetDay = cols[5] || "";
+                const time = cols[0], pName = cols[1], specialty = cols[2], doctor = cols[3], sheetDay = cols[5] || "";
                 
                 const matchDay = (filterDay === "الكل" || sheetDay.includes(filterDay));
                 const matchClinic = (filterClinic === "الكل" || specialty.includes(filterClinic));
@@ -117,8 +119,8 @@
                     tbody.appendChild(tr);
                 }
             });
-            if (!found) tbody.innerHTML = "<tr><td colspan='6' style='text-align:center'>لا توجد حجوزات مسجلة</td></tr>";
-        } catch (e) { console.error(e); }
+            if (!found) tbody.innerHTML = "<tr><td colspan='6' style='text-align:center'>لا توجد حجوزات مطابقة</td></tr>";
+        } catch (e) { console.error(e); document.getElementById('loader').innerText = "حدث خطأ أثناء الاتصال"; }
     }
 
     window.saveAsImage = function() {
@@ -128,7 +130,7 @@
         });
     };
 
-    document.getElementById('today-date').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+    document.getElementById('today-date').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     initSidebar();
     loadBookings();
 </script>
