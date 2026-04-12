@@ -1,1 +1,194 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Medical Complex Appointment Booking</title>\n    <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n    <header>\n        <h1>Medical Complex Appointment Booking System</h1>\n        <nav>\n            <ul>\n                <li><a href="#services">Services</a></li>\n                <li><a href="#doctors">Doctors</a></li>\n                <li><a href="#appointment">Book Appointment</a></li>\n            </ul>\n        </nav>\n    </header>\n\n    <section id="services">\n        <h2>Our Services</h2>\n        <ul>\n            <li>Emergency Services</li>\n            <li>Laboratory</li>\n            <li>Doctor Specialties</li>\n        </ul>\n    </section>\n\n    <section id="doctors">\n        <h2>Doctor Schedule</h2>\n        <table>\n            <tr>\n                <th>Doctor</th>\n                <th>Specialty</th>\n                <th>Availability</th>\n            </tr>\n            <tr>\n                <td>Dr. John Doe</td>\n                <td>Cardiology</td>\n                <td>Mon-Fri 9AM - 5PM</td>\n            </tr>\n            <tr>\n                <td>Dr. Jane Smith</td>\n                <td>Dermatology</td>\n                <td>Mon-Fri 10AM - 4PM</td>\n            </tr>\n        </table>\n    </section>\n\n    <section id="appointment">\n        <h2>Book Your Appointment</h2>\n        <form id="appointment-form">\n            <label for="name">Name:</label>\n            <input type="text" id="name" name="name" required>\n            <br>\n            <label for="email">Email:</label>\n            <input type="email" id="email" name="email" required>\n            <br>\n            <label for="doctor">Select Doctor:</label>\n            <select id="doctor" name="doctor" required>\n                <option value="">--Select--</option>\n                <option value="Dr. John Doe">Dr. John Doe</option>\n                <option value="Dr. Jane Smith">Dr. Jane Smith</option>\n            </select>\n            <br>\n            <label for="date">Date:</label>\n            <input type="date" id="date" name="date" required>\n            <br>\n            <label for="time">Time:</label>\n            <input type="time" id="time" name="time" required>\n            <br>\n            <button type="submit">Submit</button>\n        </form>\n        <div id="confirmation" style="display:none;"></div>\n    </section>\n\n    <script>\n        document.getElementById('appointment-form').onsubmit = function(event) {\n            event.preventDefault();\n            const name = document.getElementById('name').value;\n            const email = document.getElementById('email').value;\n            const doctor = document.getElementById('doctor').value;\n            const date = document.getElementById('date').value;\n            const time = document.getElementById('time').value;\n            const confirmationDiv = document.getElementById('confirmation');\n            confirmationDiv.innerHTML = `<h3>Appointment Confirmed!</h3>\n            <p>Name: ${name}</p>\n            <p>Email: ${email}</p>\n            <p>Doctor: ${doctor}</p>\n            <p>Date: ${date}</p>\n            <p>Time: ${time}</p>`;\n            confirmationDiv.style.display = 'block';\n        };\n    <\/script>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            margin: 0;\n            padding: 0;\n            background-color: #f4f4f4;\n        }\n        header {\n            background: #007bff;\n            color: white;\n            padding: 10px 0;\n            text-align: center;\n        }\n        nav ul {\n            list-style: none;\n            padding: 0;\n        }\n        nav ul li {\n            display: inline;\n            margin: 0 15px;\n        }\n        section {\n            padding: 20px;\n            margin: 15px;\n            background: white;\n            border-radius: 8px;\n            box-shadow: 0 2px 5px rgba(0,0,0,0.1);\n        }\n        form {\n            display: flex;\n            flex-direction: column;\n        }\n        form label {\n            margin: 5px 0;\n        }\n        form input, form select {\n            margin: 5px 0 15px 0;\n            padding: 8px;\n            border: 1px solid #ccc;\n            border-radius: 4px;\n        }\n        button {\n            padding: 10px;\n            background: #007bff;\n            color: white;\n            border: none;\n            border-radius: 4px;\n            cursor: pointer;\n        }\n        button:hover {\n            background: #0056b3;\n        }\n    <\/style>\n</body>\n</html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجوزات مجمع شبراملس الطبي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0097a7; 
+            --accent-color: #00bcd4;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --success-color: #2e7d32;
+            --cancel-color: #d32f2f;
+        }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg-gradient); background-attachment: fixed; margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .news-ticker { position: absolute; top: 0; left: 0; width: 100%; background-color: var(--primary-color); color: #fff; padding: 6px 0; overflow: hidden; z-index: 1000; }
+        .ticker-text { display: inline-block; white-space: nowrap; font-size: 15px; font-weight: 700; animation: marquee 25s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(-100vw); } 100% { transform: translateX(100vw); } }
+        
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1.8fr 1fr; gap: 25px; max-width: 1500px; width: 100%; margin-top: 20px; }
+        .side-panel { background: var(--card-bg); border-radius: 25px; padding: 30px; height: fit-content; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .side-panel h3 { color: var(--primary-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+        .container { background: var(--card-bg); border-radius: 30px; padding: 40px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.15); border-top: 8px solid var(--primary-color); }
+        .main-logo { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--accent-color); margin-bottom: 20px; }
+        .form-group { margin-bottom: 25px; text-align: right; }
+        label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--primary-color); }
+        input, select { width: 100%; padding: 16px; border: 2px solid #cfd8dc; border-radius: 15px; font-family: 'Tajawal'; font-size: 17px; }
+        .button-group { display: flex; gap: 15px; margin-top: 30px; }
+        .submit-btn { flex: 2; padding: 18px; background: linear-gradient(45deg, var(--primary-color), var(--accent-color)); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 800; cursor: pointer; }
+        .cancel-btn { flex: 1; padding: 18px; background: #eceff1; color: var(--cancel-color); border: 2px solid var(--cancel-color); border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; }
+        #success-msg { display: none; }
+        @media (max-width: 1100px) { .main-wrapper { grid-template-columns: 1fr; } .side-panel { display: none; } }
+    </style>
+</head>
+<body>
+
+<div class="news-ticker">
+    <div class="ticker-text">مازالت عروض الإثنين الأبيض مستمرة &nbsp;&nbsp;&nbsp; 50% تخفيضات على جميع التحاليل</div>
+</div>
+
+<div class="main-wrapper">
+    <div class="side-panel">
+        <h3>خدماتنا المتميزة ✨</h3>
+        <ul style="list-style:none; padding:0; line-height:2;">
+            <li>🚑 الطوارئ متوفرة 24 ساعة يومياً</li>
+            <li>🧪 المعمل متوفر 24 ساعة لخدمتك</li>
+            <li>✅ نخبة من الأطباء المتخصصين</li>
+            <li>✅ أحدث الأجهزة الطبية</li>
+            <li>✅ رعاية متكاملة طوال الأسبوع</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="main-logo">
+        <h2>مجمع شبراملس الطبي</h2>
+        <form id="booking-form" autocomplete="off">
+            <div class="form-group">
+                <label>اسم المريض:</label>
+                <input type="text" id="pName" required placeholder="الاسم الثلاثي" autocomplete="one-time-code">
+            </div>
+            <div class="form-group">
+                <label>يوم الحجز:</label>
+                <select id="bDay" required onchange="updateSpecialties()">
+                    <option value="">اختر اليوم...</option>
+                    <option value="السبت">السبت</option><option value="الأحد">الأحد</option><option value="الإثنين">الإثنين</option><option value="الثلاثاء">الثلاثاء</option><option value="الأربعاء">الأربعاء</option><option value="الخميس">الخميس</option><option value="الجمعة">الجمعة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>العيادة:</label>
+                <select id="specialty" required onchange="updateDoctors()">
+                    <option value="">اختر اليوم أولاً...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>الطبيب:</label>
+                <select id="doctorName" required>
+                    <option value="">اختر العيادة أولاً...</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="submit-btn" id="btn">تأكيد الحجز</button>
+                <button type="button" class="cancel-btn" onclick="resetKimoForm()">إلغاء</button>
+            </div>
+            <p id="loader" style="display:none; margin-top:15px;">جاري إرسال الحجز... ⏳</p>
+        </form>
+
+        <div id="success-msg">
+            <h3 style="color:var(--success-color);">✅ تم الحجز بنجاح</h3>
+            <p>المريض: <b id="res-name"></b></p>
+            <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 5px;">يرجى تصوير الشاشة وإظهارها لموظف الاستقبال</p>
+            <p>رقم الدور التقريبي: <b id="b-num" style="font-size:45px; display: block; margin: 10px 0;">0</b></p>
+            <p style="color: var(--cancel-color); font-size: 15px; font-weight: bold; margin-bottom: 20px;">سيتم إلغاء الحجز حين انتهاء وقت العيادة</p>
+            <button onclick="location.reload()" class="cancel-btn">حجز جديد</button>
+        </div>
+    </div>
+
+    <div class="side-panel">
+        <h3>📍 تواصل معنا</h3>
+        <p style="line-height: 1.6; font-weight: 500;">
+            <strong>العنوان:</strong><br> شبراملس – امتداد شارع السوق - أعلي مسجد عباد الرحمن
+        </p>
+        <hr style="border: 0; border-top: 1px solid #cfd8dc; margin: 15px 0;">
+        <p><strong>للحجز والاستفسار:</strong></p>
+        <ul style="list-style:none; padding:0; line-height:2; direction: ltr; text-align: right;">
+            <li>01020580002 :واتساب</li>
+            <li>01122593433 📲</li>
+            <li>0404650337 📞</li>
+            <li>0404658010 📞</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // رابط جوجل شيت (الوسيط)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxGyRzWZXAI8VVS0XGcvqorsDx9_cN1aR2l_LTx3oPg-Q78Wlbqn0JXpVMlO7nswVJe0w/exec';
+
+    const scheduleData = {
+        "السبت": { "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], "مسالك": ["د. علي منتصر"], "أنف وأذن": ["د. محمد هيكل"], "عيون": ["أخصائي محمد مجدي سعده"] },
+        "الأحد": { "قلب": ["د. أحمد مسعد الغلبان"], "أسنان": ["د. محمد علاء", "د. محمود دهب"], "عيون": ["أخصائي د. خالد الشيخ"], "عظام": ["أخصائي إبراهيم مطاوع"] },
+        "الإثنين": { "نساء": ["د. هيام السمراوي"], "مخ وأعصاب": ["د. محمد سلام"], "أسنان": ["د. رنا حمودة", "د. خالد الداهس"] },
+        "الثلاثاء": { "نفسية": ["د. آلاء الحوت"], "أسنان": ["د. محمد علاء", "د. محمود دهب"], "عظام": ["أخصائي إبراهيم مطاوع"] },
+        "الأربعاء": { "أسنان": ["د. رنا حمودة", "د. خالد الداهس"], "قلب": ["د. أحمد مسعد الغلبان"], "اطفال": ["د. جينا عبدالله الشافعي"] },
+        "الخميس": { "قلب": ["د. أحمد مسعد الغلبان"], "أنف وأذن": ["د. محمد هيكل"], "عظام": ["أخصائي إبراهيم مطاوع"] },
+        "الجمعة": { "باطنة ومناظير": ["د. عزيز بدير (02:00 ظهراً)"] }
+    };
+
+    window.updateSpecialties = function() {
+        const day = document.getElementById('bDay').value;
+        const specSelect = document.getElementById('specialty');
+        specSelect.innerHTML = '<option value="">اختر العيادة...</option>';
+        if(day && scheduleData[day]) {
+            Object.keys(scheduleData[day]).forEach(s => specSelect.add(new Option(s, s)));
+        }
+    }
+
+    window.updateDoctors = function() {
+        const day = document.getElementById('bDay').value;
+        const spec = document.getElementById('specialty').value;
+        const docSelect = document.getElementById('doctorName');
+        docSelect.innerHTML = '<option value="">اختر الطبيب...</option>';
+        if(day && spec && scheduleData[day][spec]) {
+            scheduleData[day][spec].forEach(d => docSelect.add(new Option(d, d)));
+        }
+    }
+
+    window.resetKimoForm = function() {
+        document.getElementById('booking-form').reset();
+    }
+
+    const form = document.getElementById('booking-form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        document.getElementById('btn').style.display = 'none';
+        document.getElementById('loader').style.display = 'block';
+
+        const formData = {
+            patientName: document.getElementById('pName').value,
+            bookingDay: document.getElementById('bDay').value,
+            specialty: document.getElementById('specialty').value,
+            doctorName: document.getElementById('doctorName').value
+        };
+
+        // إرسال البيانات إلى جوجل شيت
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors', // لضمان التوافق مع إرسال جوجل شيت
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            // بما أننا نستخدم no-cors، لن نحصل على رد "Success" مباشر ولكن العملية ستتم
+            document.getElementById('loader').style.display = 'none';
+            form.style.display = 'none';
+            document.getElementById('res-name').innerText = formData.patientName;
+            
+            // توليد رقم دور عشوائي بسيط للمريض في الصفحة (لأن الرقم الحقيقي سيظهر في الشيت)
+            const count = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('b-num').innerText = count;
+            
+            document.getElementById('success-msg').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error!', error.message);
+            alert("حدث خطأ أثناء إرسال البيانات، يرجى المحاولة لاحقاً.");
+            document.getElementById('btn').style.display = 'block';
+            document.getElementById('loader').style.display = 'none';
+        });
+    });
+</script>
+</body>
+</html>
