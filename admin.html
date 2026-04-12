@@ -80,13 +80,42 @@
 
 <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
+    const schedule = {
+        "السبت": ["أسنان", "مسالك", "أنف وأذن", "عيون"],
+        "الأحد": ["قلب", "أسنان", "عيون", "عظام"],
+        "الإثنين": ["نساء", "مخ وأعصاب", "أسنان"],
+        "الثلاثاء": ["نفسية", "أسنان", "عظام"],
+        "الأربعاء": ["أسنان", "قلب", "اطفال"],
+        "الخميس": ["قلب", "أنف وأذن", "عظام"],
+        "الجمعة": ["باطنة ومناظير"]
+    };
 
     function initSidebar() {
-        // ... (الكود السابق للقائمة الجانبية)
+        const container = document.getElementById('sidebar-content');
+        Object.keys(schedule).forEach(day => {
+            const btn = document.createElement('button');
+            btn.className = 'day-btn'; btn.innerText = day;
+            btn.onclick = () => toggleDay(day, btn);
+            
+            const clinicsDiv = document.createElement('div');
+            clinicsDiv.className = 'clinics-container'; clinicsDiv.id = `group-${day}`;
+            
+            schedule[day].forEach(clinic => {
+                const link = document.createElement('div');
+                link.className = 'clinic-link'; link.innerText = `عيادة ${clinic}`;
+                link.onclick = (e) => { e.stopPropagation(); loadData(day, clinic); };
+                clinicsDiv.appendChild(link);
+            });
+            container.appendChild(btn); container.appendChild(clinicsDiv);
+        });
     }
 
     function toggleDay(day, btn) {
-        // ... (الكود السابق لتبديل الأيام)
+        document.querySelectorAll('.clinics-container').forEach(c => c.style.display = 'none');
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`group-${day}`).style.display = 'flex';
+        btn.classList.add('active');
+        loadData(day, "الكل");
     }
 
     async function loadData(fDay = "الكل", fClinic = "الكل") {
