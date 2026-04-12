@@ -3,26 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم مجمع شبراملس الطبي</title>
+    <title>لوحة تحكم مجمع شبراملس</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0097a7; --bg: #f4f7f6; }
-        body { font-family: 'Tajawal', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        h1 { color: var(--primary); text-align: center; border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; direction: rtl; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+        :root { --primary: #0097a7; --accent: #00bcd4; --bg: #f4f7f6; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); margin: 0; display: flex; min-height: 100vh; }
+        
+        /* القائمة الجانبية */
+        .sidebar { width: 250px; background: white; border-left: 2px solid #ddd; padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+        .sidebar h3 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        .day-btn { width: 100%; padding: 12px; margin: 5px 0; border: none; background: #e0f7fa; color: var(--primary); border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .day-btn:hover, .day-btn.active { background: var(--primary); color: white; }
+
+        /* المحتوى الرئيسي */
+        .main-content { flex: 1; padding: 30px; }
+        .header-card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(--primary); margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; border: 1px solid #eee; text-align: center; }
         th { background: var(--primary); color: white; }
-        tr:nth-child(even) { background: #f9f9f9; }
-        .status-msg { text-align: center; padding: 20px; font-weight: bold; color: #666; }
+        tr:hover { background: #f1f1f1; }
+        .no-data { padding: 40px; text-align: center; color: #888; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>📋 لوحة تحكم حجوزات مجمع شبراملس</h1>
-    <div id="status" class="status-msg">جاري تحميل البيانات... ⏳</div>
-    <table id="adminTable" style="display:none;">
+<div class="sidebar">
+    <h3>📅 جدول العيادات</h3>
+    <button class="day-btn active" onclick="filterByDay('الكل', this)">عرض الكل</button>
+    <button class="day-btn" onclick="filterByDay('السبت', this)">السبت</button>
+    <button class="day-btn" onclick="filterByDay('الأحد', this)">الأحد</button>
+    <button class="day-btn" onclick="filterByDay('الإثنين', this)">الإثنين</button>
+    <button class="day-btn" onclick="filterByDay('الثلاثاء', this)">الثلاثاء</button>
+    <button class="day-btn" onclick="filterByDay('الأربعاء', this)">الأربعاء</button>
+    <button class="day-btn" onclick="filterByDay('الخميس', this)">الخميس</button>
+    <button class="day-btn" onclick="filterByDay('الجمعة', this)">الجمعة</button>
+</div>
+
+<div class="main-content">
+    <div class="header-card">
+        <h1>📋 لوحة تحكم حجوزات مجمع شبراملس</h1>
+        <p id="view-title">عرض: الكل</p>
+    </div>
+
+    <div id="loader" style="text-align:center;">جاري جلب البيانات... ⏳</div>
+    
+    <table id="dataTable" style="display:none;">
         <thead>
             <tr>
                 <th>الدور</th>
@@ -35,57 +61,64 @@
         </thead>
         <tbody id="tableBody"></tbody>
     </table>
+    <div id="noDataMsg" class="no-data" style="display:none;">لا توجد حجوزات لهذا اليوم.</div>
 </div>
 
 <script>
-    // رابط جوجل شيت الخاص بك المباشر (CSV)
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
+    let allData = [];
 
-    async function fetchData() {
+    async function loadData() {
         try {
-            const response = await fetch(SHEET_URL);
-            const data = await response.text();
-            const rows = data.split('\n').slice(1); // تجاهل العنوان
-            
-            const tableBody = document.getElementById('tableBody');
-            const status = document.getElementById('status');
-            const table = document.getElementById('adminTable');
-            
-            tableBody.innerHTML = "";
-
-            if (rows.length === 0 || rows[0].trim() === "") {
-                status.innerText = "لا توجد حجوزات مسجلة حالياً.";
-                return;
-            }
-
-            rows.forEach(row => {
-                const cols = row.split(',');
-                if (cols.length >= 5) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${cols[5] || '-'}</td>
-                        <td>${cols[0]}</td>
-                        <td>${cols[1]}</td>
-                        <td>${cols[2]}</td>
-                        <td>${cols[3]}</td>
-                        <td>${cols[4]}</td>
-                    `;
-                    tableBody.appendChild(tr);
-                }
-            });
-
-            status.style.display = "none";
-            table.style.display = "table";
-
-        } catch (error) {
-            console.error(error);
-            document.getElementById('status').innerText = "❌ فشل في جلب البيانات. تأكد من نشر الملف كـ CSV.";
+            const res = await fetch(SHEET_URL);
+            const text = await res.text();
+            const rows = text.split('\n').slice(1);
+            allData = rows.filter(r => r.trim() !== "").map(r => r.split(','));
+            displayData(allData);
+        } catch (e) {
+            document.getElementById('loader').innerText = "❌ فشل الاتصال بالبيانات";
         }
     }
 
-    // تحديث تلقائي كل دقيقة
-    fetchData();
-    setInterval(fetchData, 60000);
+    function displayData(data) {
+        const body = document.getElementById('tableBody');
+        const loader = document.getElementById('loader');
+        const table = document.getElementById('dataTable');
+        const noData = document.getElementById('noDataMsg');
+
+        body.innerHTML = "";
+        loader.style.display = "none";
+
+        if (data.length === 0) {
+            table.style.display = "none";
+            noData.style.display = "block";
+        } else {
+            noData.style.display = "none";
+            table.style.display = "table";
+            data.forEach(cols => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${cols[5] || '-'}</td><td>${cols[0]}</td><td>${cols[1]}</td><td>${cols[2]}</td><td>${cols[3]}</td><td>${cols[4]}</td>`;
+                body.appendChild(tr);
+            });
+        }
+    }
+
+    function filterByDay(day, btn) {
+        // تحديث شكل الأزرار
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('view-title').innerText = "عرض: " + day;
+
+        if (day === 'الكل') {
+            displayData(allData);
+        } else {
+            const filtered = allData.filter(row => row[3] && row[3].trim() === day);
+            displayData(filtered);
+        }
+    }
+
+    loadData();
+    setInterval(loadData, 30000); // تحديث تلقائي كل 30 ثانية
 </script>
 
 </body>
