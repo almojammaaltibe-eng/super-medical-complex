@@ -1,5 +1,5 @@
 <script>
-    // الرابط المباشر للملف
+    // الرابط المباشر للملف - تم التأكد منه
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
 
     const schedule = {
@@ -49,6 +49,22 @@
         loadBookings(day, "الكل");
     }
 
+    // وظيفة محسنة لتقسيم سطر CSV مع احترام الفواصل داخل الأقواس
+    function parseCSVRow(row) {
+        const result = [];
+        let cur = '';
+        let inQuote = false;
+        for (let char of row) {
+            if (char === '"') inQuote = !inQuote;
+            else if (char === ',' && !inQuote) {
+                result.push(cur.trim());
+                cur = '';
+            } else cur += char;
+        }
+        result.push(cur.trim());
+        return result;
+    }
+
     async function loadBookings(day = "الكل", clinic = "الكل") {
         const tbody = document.getElementById('tableBody');
         const loader = document.getElementById('loader');
@@ -57,24 +73,28 @@
         viewTitle.innerText = `عرض: ${day} | ${clinic}`;
         tbody.innerHTML = "";
         loader.style.display = "block";
-        loader.innerText = "جاري تحديث البيانات...";
+        loader.innerText = "جاري تحديث البيانات من السحابة... ⏳";
 
         try {
-            // إضافة رقم عشوائي لمنع المتصفح من كاش البيانات القديمة
-            const finalUrl = SHEET_URL + "&t=" + new Date().getTime();
-            const response = await fetch(finalUrl);
+            // إضافة cache: 'no-store' تضمن أن المتصفح يسحب أحدث البيانات دائماً
+            const response = await fetch(SHEET_URL + "&t=" + new Date().getTime(), { cache: 'no-store' });
+            if (!response.ok) throw new Error('فشل الوصول للملف');
+            
             const data = await response.text();
             
-            // تقسيم الأسطر
-            const rows = data.split(/\r?\n/).map(row => row.split(',').map(cell => cell.trim().replace(/"/g, '')));
+            // تقسيم الأسطر بشكل سليم
+            const lines = data.split(/\r?\n/).filter(line => line.trim() !== "");
+            const rows = lines.map(line => parseCSVRow(line).map(cell => cell.replace(/"/g, '')));
             
             loader.style.display = "none";
-            const bookings = rows.slice(1).filter(r => r.length > 1 && r[0] !== "");
+            const bookings = rows.slice(1); // تخطي سطر العنوان
 
             let found = false;
             let displayCounter = 1;
 
             bookings.forEach(cols => {
+                if (cols.length < 3) return; // سطر فارغ
+
                 const patient = cols[0];
                 const rowDay = cols[1];
                 const specialty = cols[2];
@@ -100,18 +120,22 @@
             });
 
             if (!found) {
-                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'>لا توجد حجوزات لهذا الاختيار</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px; color: #666;'>📭 لا توجد حجوزات مسجلة لهذا الاختيار</td></tr>";
             }
         } catch (e) { 
-            loader.innerText = "حدث خطأ في الاتصال. جرب تحديث الصفحة.";
-            console.error(e);
+            loader.innerText = "⚠️ تعذر جلب البيانات. تأكد من اتصالك بالإنترنت ومن فتح الرابط من GitHub وليس من جهازك مباشرة.";
+            console.error("Kemo Code Error:", e);
         }
     }
 
     window.saveAsImage = function() {
+        if (typeof html2canvas === 'undefined') {
+            alert("يرجى الانتظار حتى تحميل مكتبة التصوير...");
+            return;
+        }
         html2canvas(document.getElementById('capture-area')).then(canvas => {
             const link = document.createElement('a');
-            link.download = 'حجوزات_شبراملس.png';
+            link.download = `حجوزات_${day === "الكل" ? "مجمع_شبراملس" : day}.png`;
             link.href = canvas.toDataURL();
             link.click();
         });
@@ -119,5 +143,5 @@
 
     document.getElementById('today-date').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     initSidebar();
-    loadBookings("الكل", "الكل"); // تحميل الكل عند البداية
+    loadBookings("الكل", "الكل");
 </script>
