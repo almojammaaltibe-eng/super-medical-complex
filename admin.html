@@ -143,7 +143,7 @@
                 link.onclick = (e) => { 
                     e.stopPropagation(); 
                     const searchName = docName.split('(')[0].trim();
-                    loadData(day, searchName); 
+                    loadData(day, searchName); // تحميل الحجوزات الخاصة بالطبيب المحدد
                 };
                 clinicsDiv.appendChild(link);
             });
