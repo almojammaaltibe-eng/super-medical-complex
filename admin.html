@@ -3,232 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم مجمع شبراملس</title>
+    <title>لوحة التحكم - مجمع شبراملس</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* تحسين الألوان لتصبح أكثر وضوحاً وتباينًا */
-        :root { 
-            --primary-dark: #006064; 
-            --primary-bright: #00bcd4; 
-            --accent-orange: #ff6f00;
-            --sidebar-bg: #ffffff;
-            --table-header: #004d40;
-        }
+        :root { --primary: #0097a7; --accent: #006064; --bg: #f0f4f4; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        body { font-family: 'Tajawal', sans-serif; background: #e9ecef; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* القائمة الجانبية بتباين أعلى */
-        .sidebar { width: 300px; background: var(--sidebar-bg); border-left: 3px solid var(--primary-dark); padding: 20px; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
-        .sidebar h3 { color: var(--primary-dark); text-align: center; border-bottom: 3px solid var(--primary-bright); padding-bottom: 10px; font-weight: 900; }
-        
-        .day-btn { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #b2ebf2; background: #f0ffff; color: #004d40; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.3s; font-family: 'Tajawal'; text-align: right; font-size: 16px; }
-        .day-btn:hover, .day-btn.active { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
-        
-        .clinics-container { display: none; flex-direction: column; gap: 5px; padding: 10px; background: #e0f7fa; border-radius: 10px; margin-bottom: 15px; border: 1px solid #80deea; }
-        .clinic-link { padding: 10px; font-size: 14px; color: #000; cursor: pointer; border-right: 4px solid var(--accent-orange); background: white; margin-bottom: 3px; border-radius: 5px; font-weight: 700; }
-        .clinic-link:hover { background: var(--accent-orange); color: white; }
+        /* القائمة الجانبية */
+        .sidebar { width: 280px; background: white; border-left: 2px solid #ddd; overflow-y: auto; padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+        .sidebar h3 { color: var(--primary); text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        .doc-item { padding: 12px; margin-bottom: 8px; background: #f9f9f9; border-radius: 8px; cursor: pointer; transition: 0.3s; border: 1px solid #eee; font-weight: 700; color: #444; }
+        .doc-item:hover { background: var(--primary); color: white; transform: translateX(-5px); }
+        .doc-item.active { background: var(--accent); color: white; }
 
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
-        .card { background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 25px; border: 1px solid #ccc; }
+        /* المحتوى الرئيسي */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
-        .header-title { text-align: center; color: var(--primary-dark); font-weight: 900; font-size: 28px; margin: 0; }
-        .view-info { background: var(--accent-orange); color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin: 15px 0; font-size: 18px; }
-
-        .controls { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
-        .btn { padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Tajawal'; font-weight: 900; color: white; font-size: 16px; }
-        .btn-print { background: #2c3e50; }
-        .btn-image { background: #27ae60; }
-
-        /* ستايل الشريط المتحرك الجديد */
-        .news-ticker {
-            background: #2c3e50;
-            color: #fff;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            font-weight: bold;
-            border: 2px solid var(--primary-bright);
-        }
-        .ticker-content {
-            display: inline-block;
-            padding-right: 100%;
-            animation: ticker 20s linear infinite;
-        }
-        @keyframes ticker {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* جدول بوضوح عالي جداً */
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background: var(--table-header); color: white; padding: 18px; font-size: 17px; border: 1px solid #000; }
-        td { padding: 15px; text-align: center; border: 1px solid #ccc; color: #000; font-size: 16px; font-weight: 600; }
-        tr:nth-child(even) { background: #f2f2f2; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        th { background: var(--primary); color: white; padding: 15px; text-align: center; }
+        td { padding: 15px; text-align: center; border-bottom: 1px solid #eee; font-size: 16px; }
+        .turn-no { background: #d32f2f; color: white; padding: 6px 15px; border-radius: 20px; font-weight: 900; }
         
-        .turn-number { font-size: 24px; font-weight: 900; color: #d32f2f; }
-        #loader { text-align: center; font-size: 20px; color: var(--primary-dark); padding: 20px; display: none; }
+        #currentDocTitle { color: var(--accent); margin: 0; }
+        .refresh-btn { padding: 8px 15px; background: #eee; border: none; border-radius: 5px; cursor: pointer; font-family: 'Tajawal'; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h3>🏥 مجمع شبراملس</h3>
-        <div id="sidebar-content"></div>
-    </div>
-
-    <div class="main-content">
-        <div class="card" id="print-area">
-            <h1 class="header-title">📋 كشف حجوزات العيادات</h1>
-            <div id="current-date" style="text-align: center; font-weight: bold; margin-bottom: 10px;"></div>
-            
-            <div class="news-ticker" id="ticker-bar">
-                <div class="ticker-content" id="latest-booking">جاري تحديث آخر حجز مسجل...</div>
-            </div>
-
-            <div id="view-mode" class="view-info">عرض جميع الحجوزات</div>
-            
-            <div class="controls">
-                <button class="btn btn-print" onclick="window.print()">🖨️ طباعة الكشف</button>
-                <button class="btn btn-image" onclick="saveImage()">🖼️ حفظ كصورة للواتساب</button>
-                <button class="btn" style="background:#0097a7" onclick="loadData()">🔄 تحديث البيانات</button>
-            </div>
-
-            <div id="loader">🔄 جاري جلب البيانات من الشيت...</div>
-            
-            <table id="mainTable">
-                <thead>
-                    <tr>
-                        <th style="width: 80px;">الدور</th>
-                        <th>اسم المريض</th>
-                        <th>التخصص/العيادة</th>
-                        <th>اسم الطبيب</th>
-                        <th>اليوم</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
+<div class="sidebar">
+    <h3>الأطباء 👨‍⚕️</h3>
+    <div id="doctorsList">
         </div>
+</div>
+
+<div class="main-content">
+    <div class="header-area">
+        <h2 id="currentDocTitle">اختر طبيباً من القائمة</h2>
+        <button class="refresh-btn" onclick="fetchData()">تحديث البيانات 🔄</button>
     </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>رقم الدور</th>
+                <th>اسم المريض</th>
+                <th>اليوم</th>
+            </tr>
+        </thead>
+        <tbody id="resBody">
+            <tr><td colspan="3" style="color:#999;">يرجى اختيار طبيب لعرض حجوزاته</td></tr>
+        </tbody>
+    </table>
+</div>
 
 <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
+    const csvURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6lZ7yLCKil5NIOV2s7fdyG3dya6adALMv3pp3o0S4k/pub?output=csv';
     
-    const schedule = {
-        "السبت": ["د. رنا حمودة (أسنان)", "د. علي منتصر (مسالك بولية)", "د. محمد هيكل (أنف وأذن وحنجرة)", "د. خالد الداهس (أسنان)", "محمد مجدي سعده (عيون)"],
-        "الأحد": ["د. أحمد مسعد الغلبان (قلب وأوعية)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. خالد أحمد الشيخ (رمد)", "د. علي منتصر (مسالك بولية)", "د.إبراهيم مطاوع (عظام وعمود فقري)"],
-        "الإثنين": ["د. هيام السمراوي (نساء وتوليد)", "د. محمد سلام (مخ وأعصاب)", "د. رنا حمودة (أسنان)", "د. علي منتصر (مسالك بولية)", "د. خالد الداهس (أسنان)"],
-        "الثلاثاء": ["د. سناء الحماقي (أنف وأذن)", "د. آلاء الحوت (نفسية وعصبية)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. علي منتصر (مسالك بولية)", "إبراهيم مطاوع (عظام وعمود فقري)", "محمد مجدي سعده (عيون)"],
-        "الأربعاء": ["د. رنا حمودة (أسنان)", "د. أحمد مسعد الغلبان (قلب وأوعية)", "د. علي منتصر (مسالك بولية)", "د. خالد الداهس (أسنان)", "د. جينا عبدالله الشافعي (اطفال)"],
-        "الخميس": ["د. أحمد مسعد الغلبان (قلب وأوعية)", "د. محمد هيكل (أنف وأذن وحنجرة)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. علي منتصر (مسالك بولية)", "إبراهيم مطاوع (عظام وعمود فقري)", "محمد مجدي سعده (عيون)"],
-        "الجمعة": ["د. عزيز بدير (باطنة ومناظير)"]
-    };
+    // قائمة الأطباء (يجب أن تطابق الأسماء في كود index.html تماماً)
+    const doctors = [
+        "د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)", "د. علي منتصر (مسالك بولية)",
+        "د. محمد هيكل (أنف وأذن وحنجرة)", "محمد مجدي سعده (عيون)", "د. أحمد مسعد الغلبان (قلب وأوعية)",
+        "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. خالد أحمد الشيخ (رمد)",
+        "د.إبراهيم مطاوع (عظام وعمود فقري)", "د. هيام السمراوي (نساء وتوليد)", "د. محمد سلام (مخ وأعصاب)",
+        "د. سناء الحماقي (أنف وأذن)", "د. آلاء الحوت (نفسية وعصبية)", "إبراهيم مطاوع (عظام وعمود فقري)",
+        "د. جينا عبدالله الشافعي (اطفال)", "د. عزيز بدير (باطنة ومناظير)"
+    ];
 
+    let allData = [];
+
+    // إنشاء القائمة الجانبية
     function initSidebar() {
-        const container = document.getElementById('sidebar-content');
-        Object.keys(schedule).forEach(day => {
-            const btn = document.createElement('button');
-            btn.className = 'day-btn'; btn.innerText = "📅 " + day;
-            btn.onclick = () => toggleDay(day, btn);
-            
-            const clinicsDiv = document.createElement('div');
-            clinicsDiv.className = 'clinics-container'; clinicsDiv.id = `group-${day}`;
-            
-            schedule[day].forEach(docName => {
-                const link = document.createElement('div');
-                link.className = 'clinic-link'; link.innerText = "👨‍⚕️ " + docName;
-                link.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    const searchName = docName.split('(')[0].trim();
-                    loadData(day, searchName); // تحميل الحجوزات الخاصة بالطبيب المحدد
-                };
-                clinicsDiv.appendChild(link);
-            });
-            container.appendChild(btn); container.appendChild(clinicsDiv);
+        const list = document.getElementById('doctorsList');
+        doctors.forEach(doc => {
+            const div = document.createElement('div');
+            div.className = 'doc-item';
+            div.innerText = doc;
+            div.onclick = () => showDoctorAppointments(doc, div);
+            list.appendChild(div);
         });
     }
 
-    function toggleDay(day, btn) {
-        document.querySelectorAll('.clinics-container').forEach(c => c.style.display = 'none');
-        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`group-${day}`).style.display = 'flex';
-        btn.classList.add('active');
-        loadData(day, "الكل");
+    async function fetchData() {
+        try {
+            const response = await fetch(csvURL);
+            const text = await response.text();
+            const rows = text.split('\n').slice(1);
+            allData = rows.map(r => {
+                const c = r.split(',');
+                return { name: c[0], day: c[1], doc: c[3], turn: c[5] };
+            });
+            console.log("Data Updated");
+        } catch (e) { console.error("Fetch Error"); }
     }
 
-    async function loadData(targetDay = "الكل", targetDoc = "الكل") {
-        const tbody = document.getElementById('tableBody');
-        const loader = document.getElementById('loader');
-        const ticker = document.getElementById('latest-booking');
-        document.getElementById('view-mode').innerText = `المعروض الآن: عيادة ${targetDoc} - يوم ${targetDay}`;
+    function showDoctorAppointments(docName, element) {
+        // تحديث التصميم النشط
+        document.querySelectorAll('.doc-item').forEach(d => d.classList.remove('active'));
+        element.classList.add('active');
         
-        tbody.innerHTML = ""; loader.style.display = "block";
+        document.getElementById('currentDocTitle').innerText = "حجوزات: " + docName;
+        
+        const body = document.getElementById('resBody');
+        body.innerHTML = '';
 
-        try {
-            const resp = await fetch(`${CSV_URL}&t=${Date.now()}`);
-            const text = await resp.text();
-            const rows = text.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.trim().replace(/"/g, '')));
-            
-            loader.style.display = "none";
-            let displayCounter = 1;
+        // الفلترة بناءً على اسم الطبيب المختار فقط
+        // نستخدم trim() لضمان عدم وجود مسافات تعطل البحث
+        const filtered = allData.filter(row => row.doc && row.doc.trim() === docName.trim());
 
-            // استخراج آخر حجز مسجل (آخر سطر في الشيت)
-            if (rows.length > 1) {
-                const lastRow = rows[rows.length - 1];
-                if (lastRow.length >= 5) {
-                    ticker.innerText = `آخر حجز تم تسجيله: المريض (${lastRow[1]}) - العيادة: ${lastRow[2]} - الطبيب: ${lastRow[3]}`;
-                }
-            }
-
-            for(let i = 1; i < rows.length; i++) {
-                const parts = rows[i];
-                if (parts.length < 5) continue;
-
-                const pName = parts[1];
-                const pClinic = parts[2];
-                const pDoc = parts[3];
-                const pDay = parts[5];
-
-                const matchDay = (targetDay === "الكل" || pDay.includes(targetDay));
-                const matchDoc = (targetDoc === "الكل" || pDoc.includes(targetDoc) || targetDoc.includes(pDoc));
-
-                if (matchDay && matchDoc) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><span class="turn-number">${displayCounter}</span></td>
-                        <td style="text-align:right">${pName}</td>
-                        <td>${pClinic}</td>
-                        <td>${pDoc}</td>
-                        <td>${pDay}</td>
-                    `;
-                    tbody.appendChild(tr);
-                    displayCounter++;
-                }
-            }
-
-            if (displayCounter === 1) {
-                tbody.innerHTML = "<tr><td colspan='5' style='padding:40px;'>لا توجد حجوزات مسجلة لهذا الاختيار</td></tr>";
-            }
-
-        } catch (err) {
-            loader.innerText = "❌ فشل في جلب البيانات. تأكد من اتصال الإنترنت.";
+        if (filtered.length === 0) {
+            body.innerHTML = '<tr><td colspan="3">لا توجد حجوزات مسجلة لهذا الطبيب</td></tr>';
+        } else {
+            // ترتيب حسب الدور
+            filtered.sort((a, b) => parseInt(a.turn) - parseInt(b.turn));
+            filtered.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="turn-no">${item.turn}</span></td>
+                    <td>${item.name}</td>
+                    <td>${item.day}</td>
+                `;
+                body.appendChild(tr);
+            });
         }
     }
 
-    window.saveImage = function() {
-        html2canvas(document.getElementById('print-area')).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `حجوزات-${new Date().toLocaleDateString()}.png`; 
-            link.href = canvas.toDataURL(); link.click();
-        });
-    };
-
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+    // التشغيل
     initSidebar();
-    loadData();
+    fetchData();
+    setInterval(fetchData, 60000); // تحديث كل دقيقة
 </script>
+
 </body>
 </html>
