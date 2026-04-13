@@ -40,6 +40,29 @@
         .btn-print { background: #2c3e50; }
         .btn-image { background: #27ae60; }
 
+        /* ستايل الشريط المتحرك الجديد */
+        .news-ticker {
+            background: #2c3e50;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            font-weight: bold;
+            border: 2px solid var(--primary-bright);
+        }
+        .ticker-content {
+            display: inline-block;
+            padding-right: 100%;
+            animation: ticker 20s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
         /* جدول بوضوح عالي جداً */
         table { width: 100%; border-collapse: collapse; background: white; }
         th { background: var(--table-header); color: white; padding: 18px; font-size: 17px; border: 1px solid #000; }
@@ -62,6 +85,10 @@
             <h1 class="header-title">📋 كشف حجوزات العيادات</h1>
             <div id="current-date" style="text-align: center; font-weight: bold; margin-bottom: 10px;"></div>
             
+            <div class="news-ticker" id="ticker-bar">
+                <div class="ticker-content" id="latest-booking">جاري تحديث آخر حجز مسجل...</div>
+            </div>
+
             <div id="view-mode" class="view-info">عرض جميع الحجوزات</div>
             
             <div class="controls">
@@ -90,7 +117,6 @@
 <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
     
-    // تم تحديث القائمة بالأسماء والتخصصات الجديدة بدون مواعيد
     const schedule = {
         "السبت": ["د. رنا حمودة (أسنان)", "د. علي منتصر (مسالك بولية)", "د. محمد هيكل (أنف وأذن وحنجرة)", "د. خالد الداهس (أسنان)", "محمد مجدي سعده (عيون)"],
         "الأحد": ["د. أحمد مسعد الغلبان (قلب وأوعية)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. خالد أحمد الشيخ (رمد)", "د. علي منتصر (مسالك بولية)", "د.إبراهيم مطاوع (عظام وعمود فقري)"],
@@ -116,7 +142,6 @@
                 link.className = 'clinic-link'; link.innerText = "👨‍⚕️ " + docName;
                 link.onclick = (e) => { 
                     e.stopPropagation(); 
-                    // استخلاص اسم الطبيب فقط للبحث (ما قبل القوس)
                     const searchName = docName.split('(')[0].trim();
                     loadData(day, searchName); 
                 };
@@ -137,6 +162,7 @@
     async function loadData(targetDay = "الكل", targetDoc = "الكل") {
         const tbody = document.getElementById('tableBody');
         const loader = document.getElementById('loader');
+        const ticker = document.getElementById('latest-booking');
         document.getElementById('view-mode').innerText = `المعروض الآن: عيادة ${targetDoc} - يوم ${targetDay}`;
         
         tbody.innerHTML = ""; loader.style.display = "block";
@@ -148,6 +174,14 @@
             
             loader.style.display = "none";
             let displayCounter = 1;
+
+            // استخراج آخر حجز مسجل (آخر سطر في الشيت)
+            if (rows.length > 1) {
+                const lastRow = rows[rows.length - 1];
+                if (lastRow.length >= 5) {
+                    ticker.innerText = `آخر حجز تم تسجيله: المريض (${lastRow[1]}) - العيادة: ${lastRow[2]} - الطبيب: ${lastRow[3]}`;
+                }
+            }
 
             for(let i = 1; i < rows.length; i++) {
                 const parts = rows[i];
