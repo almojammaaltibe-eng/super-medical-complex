@@ -4,71 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم مجمع شبراملس</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --primary-color: #0097a7; --accent-color: #00bcd4; --sidebar-width: 280px; }
-        body { font-family: 'Tajawal', sans-serif; background: #f0f2f5; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        /* تحسين الألوان لتصبح أكثر وضوحاً وتباينًا */
+        :root { 
+            --primary-dark: #006064; 
+            --primary-bright: #00bcd4; 
+            --accent-orange: #ff6f00;
+            --sidebar-bg: #ffffff;
+            --table-header: #004d40;
+        }
         
-        .sidebar { width: var(--sidebar-width); background: white; border-left: 1px solid #ddd; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; box-shadow: -2px 0 10px rgba(0,0,0,0.05); }
-        .sidebar h3 { color: #333; text-align: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 20px; }
-        .day-btn { width: 100%; padding: 12px; margin: 5px 0; border: none; background: #e0f2f1; color: #00796b; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; font-family: 'Tajawal'; text-align: right; }
-        .day-btn:hover, .day-btn.active { background: var(--primary-color); color: white; }
-        .clinics-container { display: none; flex-direction: column; gap: 5px; padding: 10px 5px; background: #f9f9f9; border-radius: 8px; margin-bottom: 10px; }
-        .clinic-link { padding: 8px; font-size: 13px; color: #555; cursor: pointer; border-right: 3px solid var(--accent-color); border-bottom: 1px solid #eee; transition: 0.2s; }
-        .clinic-link:hover { background: #e1f5fe; color: var(--primary-color); font-weight: bold; }
-
-        .main-content { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; }
-        .card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 30px; position: relative; min-height: 80vh; }
-        .header-title { text-align: center; color: var(--primary-color); margin-bottom: 5px; }
-        .sub-header { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; }
+        body { font-family: 'Tajawal', sans-serif; background: #e9ecef; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Tajawal'; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .btn-print { background: #0097a7; color: white; }
-        .btn-image { background: #2e7d32; color: white; }
+        /* القائمة الجانبية بتباين أعلى */
+        .sidebar { width: 300px; background: var(--sidebar-bg); border-left: 3px solid var(--primary-dark); padding: 20px; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
+        .sidebar h3 { color: var(--primary-dark); text-align: center; border-bottom: 3px solid var(--primary-bright); padding-bottom: 10px; font-weight: 900; }
+        
+        .day-btn { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #b2ebf2; background: #f0ffff; color: #004d40; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.3s; font-family: 'Tajawal'; text-align: right; font-size: 16px; }
+        .day-btn:hover, .day-btn.active { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
+        
+        .clinics-container { display: none; flex-direction: column; gap: 5px; padding: 10px; background: #e0f7fa; border-radius: 10px; margin-bottom: 15px; border: 1px solid #80deea; }
+        .clinic-link { padding: 10px; font-size: 14px; color: #000; cursor: pointer; border-right: 4px solid var(--accent-orange); background: white; margin-bottom: 3px; border-radius: 5px; font-weight: 700; }
+        .clinic-link:hover { background: var(--accent-orange); color: white; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 10px; overflow: hidden; }
-        th { background: var(--primary-color); color: white; padding: 15px; text-align: center; font-size: 15px; }
-        td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; color: #444; font-size: 14px; }
-        tr:nth-child(even) { background: #f8fbfb; }
-        .badge-day { background: #ffecb3; color: #856404; padding: 3px 8px; border-radius: 5px; font-size: 12px; }
-        .turn-number { font-size: 20px; font-weight: 800; color: var(--primary-color); }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .card { background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 25px; border: 1px solid #ccc; }
+        
+        .header-title { text-align: center; color: var(--primary-dark); font-weight: 900; font-size: 28px; margin: 0; }
+        .view-info { background: var(--accent-orange); color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin: 15px 0; font-size: 18px; }
 
-        #loader { text-align: center; color: var(--primary-color); font-weight: bold; padding: 20px; display: none; }
+        .controls { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+        .btn { padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Tajawal'; font-weight: 900; color: white; font-size: 16px; }
+        .btn-print { background: #2c3e50; }
+        .btn-image { background: #27ae60; }
+
+        /* جدول بوضوح عالي جداً */
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: var(--table-header); color: white; padding: 18px; font-size: 17px; border: 1px solid #000; }
+        td { padding: 15px; text-align: center; border: 1px solid #ccc; color: #000; font-size: 16px; font-weight: 600; }
+        tr:nth-child(even) { background: #f2f2f2; }
+        
+        .turn-number { font-size: 24px; font-weight: 900; color: #d32f2f; }
+        #loader { text-align: center; font-size: 20px; color: var(--primary-dark); padding: 20px; display: none; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h3>📅 جدول العيادات</h3>
+        <h3>🏥 مجمع شبراملس</h3>
         <div id="sidebar-content"></div>
     </div>
 
     <div class="main-content">
         <div class="card" id="print-area">
-            <h2 class="header-title">📋 لوحة تحكم حجوزات مجمع شبراملس</h2>
-            <div class="sub-header" id="current-date"></div>
+            <h1 class="header-title">📋 كشف حجوزات العيادات</h1>
+            <div id="current-date" style="text-align: center; font-weight: bold; margin-bottom: 10px;"></div>
+            
+            <div id="view-mode" class="view-info">عرض جميع الحجوزات</div>
             
             <div class="controls">
-                <div id="view-mode" style="font-weight: bold; color: var(--primary-color);">عرض: الكل</div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-print" onclick="window.print()">🖨️ طباعة</button>
-                    <button class="btn btn-image" onclick="saveImage()">🖼️ حفظ كصورة</button>
-                </div>
+                <button class="btn btn-print" onclick="window.print()">🖨️ طباعة الكشف</button>
+                <button class="btn btn-image" onclick="saveImage()">🖼️ حفظ كصورة للواتساب</button>
+                <button class="btn" style="background:#0097a7" onclick="loadData()">🔄 تحديث البيانات</button>
             </div>
 
-            <div id="loader">جاري تحديث البيانات... ⏳</div>
+            <div id="loader">🔄 جاري جلب البيانات من الشيت...</div>
             
             <table id="mainTable">
                 <thead>
                     <tr>
-                        <th style="width: 70px;">رقم الدور</th>
+                        <th style="width: 80px;">الدور</th>
                         <th>اسم المريض</th>
-                        <th>العيادة</th>
-                        <th>الطبيب</th>
+                        <th>التخصص/العيادة</th>
+                        <th>اسم الطبيب</th>
                         <th>اليوم</th>
-                        <th>توقيت الحجز</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -77,36 +88,32 @@
     </div>
 
 <script>
-    // الرابط المحدث بناءً على طلبك
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
     
     const schedule = {
-        "السبت": ["د. رنا حمودة (أسنان)", "د. علي منتصر (مسالك بولية)", "د. محمد هيكل (أنف وأذن)", "د. خالد الداهس (أسنان)", "محمد مجدي سعده (عيون)"],
-        "الأحد": ["د. أحمد مسعد الغلبان (قلب)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. خالد أحمد الشيخ (رمد)", "د. علي منتصر (مسالك)", "إبراهيم مطاوع (عظام)"],
-        "الإثنين": ["د. هيام السمراوي (نساء)", "د. محمد سلام (مخ وأعصاب)", "د. رنا حمودة (أسنان)", "د. علي منتصر (مسالك)", "د. خالد الداهس (أسنان)"],
-        "الثلاثاء": ["د. سناء الحماقي (أنف وأذن)", "د. آلاء الحوت (نفسية)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. علي منتصر (مسالك)", "إبراهيم مطاوع (عظام)", "محمد مجدي سعده (عيون)"],
-        "الأربعاء": ["د. رنا حمودة (أسنان)", "د. أحمد مسعد الغلبان (قلب)", "د. علي منتصر (مسالك)", "د. خالد الداهس (أسنان)", "د. جينا عبدالله الشافعي (اطفال)"],
-        "الخميس": ["د. أحمد مسعد الغلبان (قلب)", "د. محمد هيكل (أنف وأذن)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. علي منتصر (مسالك)", "إبراهيم مطاوع (عظام)", "محمد مجدي سعده (عيون)"],
-        "الجمعة": ["د. عزيز بدير (باطنة ومناظير)"]
+        "السبت": ["رنا حمودة", "علي منتصر", "محمد هيكل", "خالد الداهس", "محمد مجدي سعده"],
+        "الأحد": ["أحمد مسعد الغلبان", "محمد علاء", "محمود دهب", "خالد أحمد الشيخ", "علي منتصر", "إبراهيم مطاوع"],
+        "الإثنين": ["هيام السمراوي", "محمد سلام", "رنا حمودة", "علي منتصر", "خالد الداهس"],
+        "الثلاثاء": ["سناء الحماقي", "آلاء الحوت", "محمد علاء", "محمود دهب", "علي منتصر", "إبراهيم مطاوع", "محمد مجدي سعده"],
+        "الأربعاء": ["رنا حمودة", "أحمد مسعد الغلبان", "علي منتصر", "خالد الداهس", "جينا عبدالله الشافعي"],
+        "الخميس": ["أحمد مسعد الغلبان", "محمد هيكل", "محمد علاء", "محمود دهب", "علي منتصر", "إبراهيم مطاوع", "محمد مجدي سعده"],
+        "الجمعة": ["عزيز بدير"]
     };
 
     function initSidebar() {
         const container = document.getElementById('sidebar-content');
         Object.keys(schedule).forEach(day => {
             const btn = document.createElement('button');
-            btn.className = 'day-btn'; btn.innerText = day;
+            btn.className = 'day-btn'; btn.innerText = "📅 " + day;
             btn.onclick = () => toggleDay(day, btn);
             
             const clinicsDiv = document.createElement('div');
             clinicsDiv.className = 'clinics-container'; clinicsDiv.id = `group-${day}`;
             
-            schedule[day].forEach(doctorStr => {
+            schedule[day].forEach(docName => {
                 const link = document.createElement('div');
-                link.className = 'clinic-link'; link.innerText = doctorStr;
-                link.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    loadData(day, doctorStr);
-                };
+                link.className = 'clinic-link'; link.innerText = "👨‍⚕️ " + docName;
+                link.onclick = (e) => { e.stopPropagation(); loadData(day, docName); };
                 clinicsDiv.appendChild(link);
             });
             container.appendChild(btn); container.appendChild(clinicsDiv);
@@ -121,77 +128,67 @@
         loadData(day, "الكل");
     }
 
-    async function loadData(targetDay = "الكل", targetDoctor = "الكل") {
+    async function loadData(targetDay = "الكل", targetDoc = "الكل") {
         const tbody = document.getElementById('tableBody');
         const loader = document.getElementById('loader');
-        document.getElementById('view-mode').innerText = `عرض: ${targetDay} | ${targetDoctor}`;
+        document.getElementById('view-mode').innerText = `المعروض الآن: عيادة ${targetDoc} - يوم ${targetDay}`;
         
         tbody.innerHTML = ""; loader.style.display = "block";
 
         try {
             const resp = await fetch(`${CSV_URL}&t=${Date.now()}`);
             const text = await resp.text();
-            const lines = text.split('\n').filter(l => l.trim() !== "");
+            const rows = text.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.trim().replace(/"/g, '')));
             
             loader.style.display = "none";
             let displayCounter = 1;
 
-            lines.slice(1).forEach(line => {
-                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.trim().replace(/"/g, ''));
-                if (parts.length < 5) return;
+            for(let i = 1; i < rows.length; i++) {
+                const parts = rows[i];
+                if (parts.length < 5) continue;
 
-                const timestamp = parts[0];
-                const patientName = parts[1];
-                const sheetClinic = parts[2];
-                const sheetDoctor = parts[3];
-                const sheetDay = parts[5];
+                // الترتيب: [1:الاسم, 2:العيادة, 3:الطبيب, 5:اليوم]
+                const pName = parts[1];
+                const pClinic = parts[2];
+                const pDoc = parts[3];
+                const pDay = parts[5];
 
-                const isCorrectDay = (targetDay === "الكل" || sheetDay.includes(targetDay));
-                
-                let isCorrectDoctor = false;
-                if (targetDoctor === "الكل") {
-                    isCorrectDoctor = true;
-                } else {
-                    if (targetDoctor.includes(sheetDoctor) || sheetDoctor.includes(targetDoctor.split('(')[0].trim())) {
-                        isCorrectDoctor = true;
-                    }
-                }
+                // تحسين البحث الجزئي لضمان ظهور البيانات
+                const matchDay = (targetDay === "الكل" || pDay.includes(targetDay));
+                const matchDoc = (targetDoc === "الكل" || pDoc.includes(targetDoc) || targetDoc.includes(pDoc));
 
-                if (isCorrectDay && isCorrectDoctor) {
-                    const row = `<tr>
+                if (matchDay && matchDoc) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
                         <td><span class="turn-number">${displayCounter}</span></td>
-                        <td style="text-align:right; font-weight:bold">${patientName}</td>
-                        <td>${sheetClinic}</td>
-                        <td style="font-size:12px; color:#555">${sheetDoctor}</td>
-                        <td><span class="badge-day">${sheetDay}</span></td>
-                        <td style="direction:ltr; font-size:11px; color:#999">${timestamp}</td>
-                    </tr>`;
-                    tbody.innerHTML += row;
+                        <td style="text-align:right">${pName}</td>
+                        <td>${pClinic}</td>
+                        <td>${pDoc}</td>
+                        <td>${pDay}</td>
+                    `;
+                    tbody.appendChild(tr);
                     displayCounter++;
                 }
-            });
+            }
 
             if (displayCounter === 1) {
-                tbody.innerHTML = "<tr><td colspan='6' style='padding:50px; color:#999'>لا توجد حجوزات مسجلة لهذا الاختيار</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='5' style='padding:40px;'>لا توجد حجوزات مسجلة لهذا الاختيار</td></tr>";
             }
 
         } catch (err) {
-            loader.innerText = "⚠️ خطأ في الاتصال بشيت جوجل";
-            console.error(err);
+            loader.innerText = "❌ فشل في جلب البيانات. تأكد من اتصال الإنترنت.";
         }
     }
 
     window.saveImage = function() {
-        const area = document.getElementById('print-area');
-        html2canvas(area).then(canvas => {
+        html2canvas(document.getElementById('print-area')).then(canvas => {
             const link = document.createElement('a');
-            link.download = 'كشف_حجوزات_المجمع.png'; 
-            link.href = canvas.toDataURL(); 
-            link.click();
+            link.download = `حجوزات-${new Date().toLocaleDateString()}.png`; 
+            link.href = canvas.toDataURL(); link.click();
         });
     };
 
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
     initSidebar();
     loadData();
 </script>
