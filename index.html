@@ -113,8 +113,8 @@
 </div>
 
 <script>
-    // رابط جوجل شيت (الوسيط)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxGyRzWZXAI8VVS0XGcvqorsDx9_cN1aR2l_LTx3oPg-Q78Wlbqn0JXpVMlO7nswVJe0w/exec';
+    // الرابط الجديد لجوجل شيت (الوسيط) بعد التعديل
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwRTqfGfR_WLGogTFKLZF-wMr1Jk5TIAsDp7p2wdNjeagwgULgfvMbi-snnAjBTLHI5YQ/exec';
 
     const scheduleData = {
         "السبت": { "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], "مسالك": ["د. علي منتصر"], "أنف وأذن": ["د. محمد هيكل"], "عيون": ["أخصائي محمد مجدي سعده"] },
@@ -162,21 +162,20 @@
             doctorName: document.getElementById('doctorName').value
         };
 
-        // إرسال البيانات إلى جوجل شيت
+        // إرسال البيانات إلى جوجل شيت باستخدام الرابط الجديد
         fetch(scriptURL, {
             method: 'POST',
-            mode: 'no-cors', // لضمان التوافق مع إرسال جوجل شيت
+            mode: 'no-cors', 
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         })
         .then(response => {
-            // بما أننا نستخدم no-cors، لن نحصل على رد "Success" مباشر ولكن العملية ستتم
             document.getElementById('loader').style.display = 'none';
             form.style.display = 'none';
             document.getElementById('res-name').innerText = formData.patientName;
             
-            // توليد رقم دور عشوائي بسيط للمريض في الصفحة (لأن الرقم الحقيقي سيظهر في الشيت)
+            // تم الحفاظ على توليد رقم الدور كما في الكود الأصلي
             const count = Math.floor(Math.random() * 10) + 1;
             document.getElementById('b-num').innerText = count;
             
