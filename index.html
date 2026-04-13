@@ -204,25 +204,33 @@
             method: 'POST',
             body: JSON.stringify(formData)
         })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('loader').style.display = 'none';
-            form.style.display = 'none';
-            document.getElementById('res-name').innerText = formData.patientName;
-            
-            // عرض الرقم الحقيقي القادم من جوجل شيت (turn)
-            document.getElementById('b-num').innerText = data.turn || "1";
-            
-            document.getElementById('success-msg').style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error!', error.message);
-            document.getElementById('loader').style.display = 'none';
-            form.style.display = 'none';
-            document.getElementById('res-name').innerText = formData.patientName;
-            document.getElementById('b-num').innerText = "تم";
-            document.getElementById('success-msg').style.display = 'block';
+// ابحث عن السطر الذي يعرض رسالة النجاح بعد استلام الرد من السكريبت
+// وقم بتعديله ليشمل اسم الطبيب
+.then(response => response.json())
+.then(result => {
+    if (result.result === "success") {
+        // جلب اسم الطبيب المختار من القائمة
+        const doctorName = document.getElementById('doctorSelector').value;
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'تم الحجز بنجاح!',
+            html: `
+                <div style="text-align: right; font-family: 'Tajawal', sans-serif;">
+                    <p><strong>اسم المريض:</strong> ${patientName}</p>
+                    <p><strong>الطبيب:</strong> ${doctorName}</p>
+                    <p style="font-size: 24px; color: #d32f2f;"><strong>رقم دورك هو: ${result.turn}</strong></p>
+                    <p style="color: #666;">يرجى تصوير الشاشة وإظهارها للموظف الاستقبال.</p>
+                </div>
+            `,
+            confirmButtonText: 'حسناً',
+            confirmButtonColor: '#0097a7'
         });
+        
+        // إعادة ضبط النموذج بعد الحجز
+        document.getElementById('bookingForm').reset();
+    }
+});
     });
 </script>
 </body>
