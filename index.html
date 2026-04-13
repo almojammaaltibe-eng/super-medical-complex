@@ -113,8 +113,8 @@
 </div>
 
 <script>
-    // الرابط المحدث لجوجل شيت (الوسيط)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwDAnIUeixW666fnJWxTjb1o9q0h6rZ_zCd1R9QQ7IBd9z6lD1SrxgZ8lpkqseLZjRU/exec';
+    // الرابط الأخير الذي أرسلته الخاص بحساب almojammaaltibe@gmail.com
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbydpWBLbU-3f0gSlJH4mBC-i_iZyQysn4RTaOK3DnteyutUglVjBgL7z9w_0mGTk46M4A/exec';
 
     const scheduleData = {
         "السبت": { "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], "مسالك": ["د. علي منتصر"], "أنف وأذن": ["د. محمد هيكل"], "عيون": ["أخصائي محمد مجدي سعده"] },
@@ -162,7 +162,7 @@
             doctorName: document.getElementById('doctorName').value
         };
 
-        // إرسال البيانات واستلام رقم الدور
+        // إرسال البيانات واستلام الرد الذي يحتوي على رقم الدور الحقيقي
         fetch(scriptURL, {
             method: 'POST',
             body: JSON.stringify(formData)
@@ -173,14 +173,14 @@
             form.style.display = 'none';
             document.getElementById('res-name').innerText = formData.patientName;
             
-            // عرض رقم الدور الحقيقي الذي حسبه الشيت
+            // هنا يتم عرض "رقم الدور" القادم مباشرة من الشيت
             document.getElementById('b-num').innerText = data.turn || "1";
             
             document.getElementById('success-msg').style.display = 'block';
         })
         .catch(error => {
-            // في حالة حدوث خطأ في قراءة الرد، نظهر نجاح عام
             console.error('Error!', error.message);
+            // في حالة حدوث أي خطأ في الاتصال، يتم عرض حالة نجاح احتياطية
             document.getElementById('loader').style.display = 'none';
             form.style.display = 'none';
             document.getElementById('res-name').innerText = formData.patientName;
