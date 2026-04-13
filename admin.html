@@ -7,21 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --primary-color: #0097a7; --accent-color: #00bcd4; --sidebar-width: 260px; }
+        :root { --primary-color: #0097a7; --accent-color: #00bcd4; --sidebar-width: 280px; }
         body { font-family: 'Tajawal', sans-serif; background: #f0f2f5; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* الجانب الأيمن (القائمة) */
         .sidebar { width: var(--sidebar-width); background: white; border-left: 1px solid #ddd; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; box-shadow: -2px 0 10px rgba(0,0,0,0.05); }
         .sidebar h3 { color: #333; text-align: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 20px; }
-        .day-btn { width: 100%; padding: 12px; margin: 5px 0; border: none; background: #e0f2f1; color: #00796b; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; font-family: 'Tajawal'; }
+        .day-btn { width: 100%; padding: 12px; margin: 5px 0; border: none; background: #e0f2f1; color: #00796b; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; font-family: 'Tajawal'; text-align: right; }
         .day-btn:hover, .day-btn.active { background: var(--primary-color); color: white; }
-        .clinics-container { display: none; flex-direction: column; gap: 5px; padding: 10px 15px 10px 0; background: #f9f9f9; border-radius: 8px; }
-        .clinic-link { padding: 8px; font-size: 14px; color: #555; cursor: pointer; border-right: 3px solid var(--accent-color); border-bottom: 1px solid #eee; }
-        .clinic-link:hover { color: var(--primary-color); font-weight: bold; }
+        .clinics-container { display: none; flex-direction: column; gap: 5px; padding: 10px 5px; background: #f9f9f9; border-radius: 8px; margin-bottom: 10px; }
+        .clinic-link { padding: 8px; font-size: 13px; color: #555; cursor: pointer; border-right: 3px solid var(--accent-color); border-bottom: 1px solid #eee; transition: 0.2s; }
+        .clinic-link:hover { background: #e1f5fe; color: var(--primary-color); font-weight: bold; }
 
-        /* منطقة المحتوى */
         .main-content { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; }
-        .card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 30px; position: relative; }
+        .card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 30px; position: relative; min-height: 80vh; }
         .header-title { text-align: center; color: var(--primary-color); margin-bottom: 5px; }
         .sub-header { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; }
         
@@ -30,15 +28,14 @@
         .btn-print { background: #0097a7; color: white; }
         .btn-image { background: #2e7d32; color: white; }
 
-        /* الجدول المنسق */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 10px; overflow: hidden; }
         th { background: var(--primary-color); color: white; padding: 15px; text-align: center; font-size: 15px; }
         td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; color: #444; font-size: 14px; }
         tr:nth-child(even) { background: #f8fbfb; }
-        tr:hover { background: #e1f5fe; }
         .badge-day { background: #ffecb3; color: #856404; padding: 3px 8px; border-radius: 5px; font-size: 12px; }
+        .turn-number { font-size: 20px; font-weight: 800; color: var(--primary-color); }
 
-        #loader { text-align: center; color: var(--primary-color); font-weight: bold; padding: 20px; }
+        #loader { text-align: center; color: var(--primary-color); font-weight: bold; padding: 20px; display: none; }
     </style>
 </head>
 <body>
@@ -61,17 +58,17 @@
                 </div>
             </div>
 
-            <div id="loader">جاري جلب البيانات...</div>
+            <div id="loader">جاري تحديث البيانات... ⏳</div>
             
             <table id="mainTable">
                 <thead>
                     <tr>
-                        <th style="width: 60px;">الدور</th>
+                        <th style="width: 70px;">رقم الدور</th>
                         <th>اسم المريض</th>
                         <th>العيادة</th>
                         <th>الطبيب</th>
                         <th>اليوم</th>
-                        <th>وقت التسجيل</th>
+                        <th>توقيت الحجز</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -81,57 +78,16 @@
 
 <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
+    
+    // بيانات الجدول (نفس بياناتك الأصلية)
     const schedule = {
-        "السبت": [
-            "د. رنا حمودة (أسنان) 04:00 عصراً",
-            "د. علي منتصر (مسالك بولية) 07:00 مساءً",
-            "د. محمد هيكل (أنف وأذن وحنجرة) 07:00 مساءً",
-            "د. خالد الداهس (أسنان) 09:00 مساءً",
-            "محمد مجدي سعده أخصائي طب و جراحة العيون 02:00 ظهراً"
-        ],
-        "الأحد": [
-            "د. أحمد مسعد الغلبان (قلب وأوعية) 06:00 مساءً",
-            "د. محمد علاء (أسنان) 03:00 مساءً",
-            "د. محمود دهب (أسنان) 08:00 مساءً",
-            "د. خالد أحمد الشيخ أخصائي الرمد وجراحات العيون 05:00 عصراً",
-            "د. علي منتصر (مسالك بولية) 07:00 مساءً",
-            "إبراهيم مطاوع اخصائي العظام و جراحة العمود الفقري 04:00 عصراً"
-        ],
-        "الإثنين": [
-            "د. هيام السمراوي (نساء وتوليد) 01:00 ظهراً",
-            "د. محمد سلام (جراحة مخ وأعصاب) 08:00 مساءً",
-            "د. رنا حمودة (أسنان) 04:00 عصراً",
-            "د. علي منتصر (مسالك بولية) 07:00 مساءً",
-            "د. خالد الداهس (أسنان) 09:00 مساءً"
-        ],
-        "الثلاثاء": [
-            "د. سناء الحماقي (أنف وأذن) 04:00 مساءً",
-            "د. آلاء الحوت (نفسية وعصبية) 06:00 مساءً",
-            "د. محمد علاء (أسنان) 03:00 مساءً",
-            "د. محمود دهب (أسنان) 08:00 مساءً",
-            "د. علي منتصر (مسالك بولية) 07:00 مساءً",
-            "إبراهيم مطاوع اخصائي العظام و جراحة العمود الفقري 04:00 عصراً",
-            "محمد مجدي سعده أخصائي طب و جراحة العيون 02:00 ظهراً"
-        ],
-        "الأربعاء": [
-            "د. رنا حمودة (أسنان) 04:00 عصراً",
-            "د. أحمد مسعد الغلبان (قلب وأوعية) 06:00 مساءً",
-            "د. علي منتصر (مسالك بولية) 07:00 مساءً",
-            "د. خالد الداهس (أسنان) 09:00 مساءً",
-            "د. جينا عبدالله الشافعي اخصائية اطفال وحديثي الولاده 06:00 مساءً"
-        ],
-        "الخميس": [
-            "د. أحمد مسعد الغلبان (قلب وأوعية) 06:00 مساءً",
-            "د. محمد هيكل (أنف وأذن وحنجرة) 07:00 مساءً",
-            "د. محمد علاء (أسنان) 03:00 مساءً",
-            "د. محمود دهب (أسنان) 08:00 مساءً",
-            "د. علي منتصر (مسالك بولية) 07:00 مساءً",
-            "إبراهيم مطاوع اخصائي العظام و جراحة العمود الفقري 04:00 عصراً",
-            "محمد مجدي سعده أخصائي طب و جراحة العيون 02:00 ظهراً"
-        ],
-        "الجمعة": [
-            "د. عزيز بدير استشاري الكبد والجهاز الهضمي (باطنة ومناظير) 02:00 ظهراً"
-        ]
+        "السبت": ["د. رنا حمودة (أسنان)", "د. علي منتصر (مسالك بولية)", "د. محمد هيكل (أنف وأذن)", "د. خالد الداهس (أسنان)", "محمد مجدي سعده (عيون)"],
+        "الأحد": ["د. أحمد مسعد الغلبان (قلب)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. خالد أحمد الشيخ (رمد)", "د. علي منتصر (مسالك)", "إبراهيم مطاوع (عظام)"],
+        "الإثنين": ["د. هيام السمراوي (نساء)", "د. محمد سلام (مخ وأعصاب)", "د. رنا حمودة (أسنان)", "د. علي منتصر (مسالك)", "د. خالد الداهس (أسنان)"],
+        "الثلاثاء": ["د. سناء الحماقي (أنف وأذن)", "د. آلاء الحوت (نفسية)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. علي منتصر (مسالك)", "إبراهيم مطاوع (عظام)", "محمد مجدي سعده (عيون)"],
+        "الأربعاء": ["د. رنا حمودة (أسنان)", "د. أحمد مسعد الغلبان (قلب)", "د. علي منتصر (مسالك)", "د. خالد الداهس (أسنان)", "د. جينا عبدالله الشافعي (اطفال)"],
+        "الخميس": ["د. أحمد مسعد الغلبان (قلب)", "د. محمد هيكل (أنف وأذن)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. علي منتصر (مسالك)", "إبراهيم مطاوع (عظام)", "محمد مجدي سعده (عيون)"],
+        "الجمعة": ["د. عزيز بدير (باطنة ومناظير)"]
     };
 
     function initSidebar() {
@@ -144,10 +100,13 @@
             const clinicsDiv = document.createElement('div');
             clinicsDiv.className = 'clinics-container'; clinicsDiv.id = `group-${day}`;
             
-            schedule[day].forEach(clinic => {
+            schedule[day].forEach(doctorStr => {
                 const link = document.createElement('div');
-                link.className = 'clinic-link'; link.innerText = clinic;
-                link.onclick = (e) => { e.stopPropagation(); loadData(day, clinic); };
+                link.className = 'clinic-link'; link.innerText = doctorStr;
+                link.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    loadData(day, doctorStr); // نرسل اليوم واسم الدكتور للفلترة
+                };
                 clinicsDiv.appendChild(link);
             });
             container.appendChild(btn); container.appendChild(clinicsDiv);
@@ -162,10 +121,10 @@
         loadData(day, "الكل");
     }
 
-    async function loadData(fDay = "الكل", fClinic = "الكل") {
+    async function loadData(targetDay = "الكل", targetDoctor = "الكل") {
         const tbody = document.getElementById('tableBody');
         const loader = document.getElementById('loader');
-        document.getElementById('view-mode').innerText = `عرض: ${fDay} | ${fClinic}`;
+        document.getElementById('view-mode').innerText = `عرض: ${targetDay} | ${targetDoctor}`;
         
         tbody.innerHTML = ""; loader.style.display = "block";
 
@@ -175,57 +134,69 @@
             const lines = text.split('\n').filter(l => l.trim() !== "");
             
             loader.style.display = "none";
-            let hasData = false;
+            let displayCounter = 1; // عداد ترقيم الأدوار للمرضى المفلترين
 
             lines.slice(1).forEach(line => {
-                // تقسيم السطر مع مراعاة النصوص التي تحتوي على فواصل
                 const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.trim().replace(/"/g, ''));
+                if (parts.length < 5) return;
+
+                // [0:الوقت, 1:الاسم, 2:العيادة, 3:الطبيب, 4:الدور, 5:اليوم]
+                const timestamp = parts[0];
+                const patientName = parts[1];
+                const sheetClinic = parts[2];
+                const sheetDoctor = parts[3];
+                const sheetDay = parts[5];
+
+                // منطق الفلترة المطور
+                const isCorrectDay = (targetDay === "الكل" || sheetDay.includes(targetDay));
                 
-                if (parts.length < 4) return;
+                let isCorrectDoctor = false;
+                if (targetDoctor === "الكل") {
+                    isCorrectDoctor = true;
+                } else {
+                    // نتحقق إذا كان اسم الدكتور في الشيت موجود داخل النص اللي ضغطنا عليه في القائمة
+                    if (targetDoctor.includes(sheetDoctor) || sheetDoctor.includes(targetDoctor.split('(')[0].trim())) {
+                        isCorrectDoctor = true;
+                    }
+                }
 
-                // الترتيب المتوقع من شيت جوجل: [0:الوقت, 1:الاسم, 2:العيادة, 3:الطبيب, 4:الدور, 5:اليوم]
-                const timestamp = parts[0] || "";
-                const name = parts[1] || "";
-                const clinic = parts[2] || "";
-                const doc = parts[3] || "";
-                const turn = parts[4] || "-";
-                const day = parts[5] || "";
-
-                const matchDay = (fDay === "الكل" || day.includes(fDay));
-                const matchClinic = (fClinic === "الكل" || clinic.includes(fClinic));
-
-                if (matchDay && matchClinic) {
-                    hasData = true;
+                if (isCorrectDay && isCorrectDoctor) {
                     const row = `<tr>
-                        <td style="font-weight:bold; color:var(--primary-color)">${turn}</td>
-                        <td style="text-align:right; font-weight:500">${name}</td>
-                        <td>${clinic}</td>
-                        <td style="font-size:12px">${doc}</td>
-                        <td><span class="badge-day">${day}</span></td>
+                        <td><span class="turn-number">${displayCounter}</span></td>
+                        <td style="text-align:right; font-weight:bold">${patientName}</td>
+                        <td>${sheetClinic}</td>
+                        <td style="font-size:12px; color:#555">${sheetDoctor}</td>
+                        <td><span class="badge-day">${sheetDay}</span></td>
                         <td style="direction:ltr; font-size:11px; color:#999">${timestamp}</td>
                     </tr>`;
                     tbody.innerHTML += row;
+                    displayCounter++; // زيادة العداد فقط للمرضى الذين يظهرون حالياً
                 }
             });
 
-            if (!hasData) tbody.innerHTML = "<tr><td colspan='6'>لا توجد حجوزات لهذا الاختيار</td></tr>";
+            if (displayCounter === 1) {
+                tbody.innerHTML = "<tr><td colspan='6' style='padding:50px; color:#999'>لا توجد حجوزات مسجلة لهذا الاختيار</td></tr>";
+            }
 
         } catch (err) {
-            loader.innerText = "خطأ في تحميل البيانات";
+            loader.innerText = "⚠️ خطأ في الاتصال بشيت جوجل";
             console.error(err);
         }
     }
 
     window.saveImage = function() {
-        html2canvas(document.getElementById('print-area')).then(canvas => {
+        const area = document.getElementById('print-area');
+        html2canvas(area).then(canvas => {
             const link = document.createElement('a');
-            link.download = 'حجوزات_شبراملس.png'; link.href = canvas.toDataURL(); link.click();
+            link.download = 'كشف_حجوزات_المجمع.png'; 
+            link.href = canvas.toDataURL(); 
+            link.click();
         });
     };
 
     document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     initSidebar();
-    loadData(); // تحميل الكل عند البدء
+    loadData(); // تحميل كل الحجوزات عند فتح الصفحة لأول مرة
 </script>
 </body>
 </html>
