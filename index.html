@@ -206,32 +206,57 @@
         })
 // ابحث عن السطر الذي يعرض رسالة النجاح بعد استلام الرد من السكريبت
 // وقم بتعديله ليشمل اسم الطبيب
+.// استبدل الجزء الخاص بالـ .then(result => { ... }) بهذا الكود
 .then(response => response.json())
 .then(result => {
+    // إيقاف مؤشر التحميل (إذا كنت تستخدمه)
+    // Swal.close(); 
+
     if (result.result === "success") {
-        // جلب اسم الطبيب المختار من القائمة
-        const doctorName = document.getElementById('doctorSelector').value;
+        // جلب البيانات من الحقول للتأكد من وجودها
+        const patientName = document.getElementById('name').value;
+        const doctorElement = document.getElementById('doctorSelector');
+        const doctorName = doctorElement ? doctorElement.value : "غير محدد";
         
+        // إظهار رسالة النجاح بشكل منسق
         Swal.fire({
             icon: 'success',
             title: 'تم الحجز بنجاح!',
             html: `
-                <div style="text-align: right; font-family: 'Tajawal', sans-serif;">
-                    <p><strong>اسم المريض:</strong> ${patientName}</p>
-                    <p><strong>الطبيب:</strong> ${doctorName}</p>
-                    <p style="font-size: 24px; color: #d32f2f;"><strong>رقم دورك هو: ${result.turn}</strong></p>
-                    <p style="color: #666;">يرجى تصوير الشاشة وإظهارها للموظف الاستقبال.</p>
+                <div style="text-align: right; direction: rtl; font-family: 'Tajawal', sans-serif; line-height: 1.6;">
+                    <p style="margin: 5px 0;"><strong>👤 المريض:</strong> ${patientName}</p>
+                    <p style="margin: 5px 0;"><strong>👨‍⚕️ الطبيب:</strong> ${doctorName}</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+                    <p style="font-size: 26px; color: #d32f2f; margin: 10px 0;"><strong>رقم دورك: ${result.turn}</strong></p>
+                    <p style="color: #666; font-size: 14px;">يرجى تصوير هذه الرسالة وتقديمها لموظف الاستقبال.</p>
                 </div>
             `,
             confirmButtonText: 'حسناً',
             confirmButtonColor: '#0097a7'
         });
         
-        // إعادة ضبط النموذج بعد الحجز
+        // إعادة ضبط النموذج بعد النجاح
+        // إعادة ضبط النموذج بعد النجاح
         document.getElementById('bookingForm').reset();
+
+    } else {
+        // في حال وجود خطأ في السكريبت
+        Swal.fire({
+            icon: 'error',
+            title: 'خطأ في الحجز',
+            text: result.error || 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى.'
+        });
     }
-});
+})
+.catch(error => {
+    console.error('Error:', error);
+    Swal.fire({
+        icon: 'error',
+        title: 'عذراً!',
+        text: 'فشل الاتصال بالنظام. تأكد من الإنترنت وحاول مرة أخرى.'
     });
+});
+// تم حذف القوس الزائد الذي كان هنا وتسبب في توقف الصفحة
 </script>
 </body>
 </html>
