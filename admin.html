@@ -77,9 +77,9 @@
     </div>
 
 <script>
+    // الرابط المحدث بناءً على طلبك
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
     
-    // بيانات الجدول (نفس بياناتك الأصلية)
     const schedule = {
         "السبت": ["د. رنا حمودة (أسنان)", "د. علي منتصر (مسالك بولية)", "د. محمد هيكل (أنف وأذن)", "د. خالد الداهس (أسنان)", "محمد مجدي سعده (عيون)"],
         "الأحد": ["د. أحمد مسعد الغلبان (قلب)", "د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)", "د. خالد أحمد الشيخ (رمد)", "د. علي منتصر (مسالك)", "إبراهيم مطاوع (عظام)"],
@@ -105,7 +105,7 @@
                 link.className = 'clinic-link'; link.innerText = doctorStr;
                 link.onclick = (e) => { 
                     e.stopPropagation(); 
-                    loadData(day, doctorStr); // نرسل اليوم واسم الدكتور للفلترة
+                    loadData(day, doctorStr);
                 };
                 clinicsDiv.appendChild(link);
             });
@@ -134,27 +134,24 @@
             const lines = text.split('\n').filter(l => l.trim() !== "");
             
             loader.style.display = "none";
-            let displayCounter = 1; // عداد ترقيم الأدوار للمرضى المفلترين
+            let displayCounter = 1;
 
             lines.slice(1).forEach(line => {
                 const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.trim().replace(/"/g, ''));
                 if (parts.length < 5) return;
 
-                // [0:الوقت, 1:الاسم, 2:العيادة, 3:الطبيب, 4:الدور, 5:اليوم]
                 const timestamp = parts[0];
                 const patientName = parts[1];
                 const sheetClinic = parts[2];
                 const sheetDoctor = parts[3];
                 const sheetDay = parts[5];
 
-                // منطق الفلترة المطور
                 const isCorrectDay = (targetDay === "الكل" || sheetDay.includes(targetDay));
                 
                 let isCorrectDoctor = false;
                 if (targetDoctor === "الكل") {
                     isCorrectDoctor = true;
                 } else {
-                    // نتحقق إذا كان اسم الدكتور في الشيت موجود داخل النص اللي ضغطنا عليه في القائمة
                     if (targetDoctor.includes(sheetDoctor) || sheetDoctor.includes(targetDoctor.split('(')[0].trim())) {
                         isCorrectDoctor = true;
                     }
@@ -170,7 +167,7 @@
                         <td style="direction:ltr; font-size:11px; color:#999">${timestamp}</td>
                     </tr>`;
                     tbody.innerHTML += row;
-                    displayCounter++; // زيادة العداد فقط للمرضى الذين يظهرون حالياً
+                    displayCounter++;
                 }
             });
 
@@ -196,7 +193,7 @@
 
     document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     initSidebar();
-    loadData(); // تحميل كل الحجوزات عند فتح الصفحة لأول مرة
+    loadData();
 </script>
 </body>
 </html>
