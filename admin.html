@@ -9,82 +9,112 @@
     <style>
         :root { --primary: #0097a7; --dark: #333; --accent: #ffeb3b; }
         body { font-family: 'Tajawal', sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-        
+
+        /* ستايل شاشة تسجيل الدخول */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary); display: flex; align-items: center;
+            justify-content: center; z-index: 9999;
+        }
+        .login-box {
+            background: white; padding: 30px; border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 300px; text-align: center;
+        }
+        .login-box h2 { color: var(--primary); margin-bottom: 20px; font-size: 18px; }
+        .login-box input {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;
+            font-family: 'Tajawal'; text-align: center;
+        }
+        .login-btn {
+            background: var(--primary); color: white; border: none;
+            width: 100%; padding: 12px; border-radius: 8px; cursor: pointer;
+            font-weight: bold; font-family: 'Tajawal';
+        }
+
+        /* إخفاء المحتوى الأصلي حتى تسجيل الدخول */
+        #mainDashboard { display: none; }
+
+        /* باقي ستايلات اللوحة الأصلية */
         .header-section { background: var(--primary); color: white; text-align: center; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .header-section h1 { margin: 0; font-size: 22px; }
         .header-section p { margin: 5px 0 0; opacity: 0.9; }
-
         marquee { background: var(--dark); color: var(--accent); padding: 10px 0; font-weight: bold; font-size: 16px; display: block; }
-
         .controls-bar { display: flex; justify-content: center; gap: 10px; padding: 15px; flex-wrap: wrap; background: white; border-bottom: 1px solid #ddd; }
         .btn { border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-family: 'Tajawal'; font-weight: bold; transition: 0.3s; color: white; }
         .btn-today { background: #2e7d32; }
         .btn-print { background: #1976d2; }
         .btn-image { background: #ef6c00; }
         .btn:hover { opacity: 0.8; }
-
         .main-container { display: flex; height: calc(100vh - 200px); }
         .sidebar { width: 250px; background: white; border-left: 1px solid #ddd; overflow-y: auto; padding: 10px; }
         .doc-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; font-size: 14px; }
         .doc-item:hover { background: #f0f7f8; }
         .doc-item.active { background: var(--primary); color: white; border-radius: 5px; }
-
         .content-area { flex: 1; padding: 20px; overflow-y: auto; }
         #printArea { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th { background: #eee; padding: 12px; text-align: right; border-bottom: 2px solid var(--primary); }
         td { padding: 12px; border-bottom: 1px solid #eee; }
         .turn-no { background: #d32f2f; color: white; padding: 3px 10px; border-radius: 15px; font-weight: bold; }
 
         @media print {
-            .sidebar, .controls-bar, marquee, .btn { display: none !important; }
+            .sidebar, .controls-bar, marquee, .btn, #loginOverlay { display: none !important; }
             .content-area { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-<div class="header-section">
-    <h1>إدارة حجوزات المجمع الطبي بشبراملس</h1>
-    <p id="todayDate"></p>
+<div id="loginOverlay">
+    <div class="login-box">
+        <img src="https://github.com/Kemo-Code/shubra-mils/blob/main/logo.png?raw=true" style="width: 80px; margin-bottom: 10px;" alt="Logo">
+        <h2>تسجيل دخول الإدارة</h2>
+        <input type="text" id="userInput" placeholder="اسم المستخدم">
+        <input type="password" id="passInput" placeholder="كلمة المرور">
+        <button class="login-btn" onclick="checkLogin()">دخول</button>
+        <p id="loginError" style="color: red; font-size: 12px; margin-top: 10px; display: none;">البيانات خاطئة!</p>
+    </div>
 </div>
 
-<marquee id="marqueeContent" behavior="scroll" direction="right">جاري سحب آخر البيانات من النظام...</marquee>
+<div id="mainDashboard">
+    <div class="header-section">
+        <h1>إدارة حجوزات المجمع الطبي بشبراملس</h1>
+        <p id="todayDate"></p>
+    </div>
 
-<div class="controls-bar">
-    <button class="btn btn-today" onclick="showAllToday()">عرض كل حجوزات اليوم</button>
-    <button class="btn btn-print" onclick="window.print()">طباعة الجدول</button>
-    <button class="btn btn-image" onclick="saveAsImage()">حفظ كصورة (JPG)</button>
-</div>
+    <marquee id="marqueeContent" behavior="scroll" direction="right">جاري سحب آخر البيانات من النظام...</marquee>
 
-<div class="main-container">
-    <div class="sidebar" id="doctorList">
-        </div>
-    
-    <div class="content-area">
-        <div id="printArea">
-            <h2 id="currentTitle" style="color: var(--primary); border-bottom: 1px solid #ddd; padding-bottom: 10px;">اختر طبيباً لعرض الحجوزات</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>الدور</th>
-                        <th>اسم المريض</th>
-                        <th>العيادة/الطبيب</th>
-                    </tr>
-                </thead>
-                <tbody id="resBody">
-                    <tr><td colspan="3" style="text-align:center;">برجاء اختيار طبيب من القائمة الجانبية</td></tr>
-                </tbody>
-            </table>
+    <div class="controls-bar">
+        <button class="btn btn-today" onclick="showAllToday()">عرض كل حجوزات اليوم</button>
+        <button class="btn btn-print" onclick="window.print()">طباعة الجدول</button>
+        <button class="btn btn-image" onclick="saveAsImage()">حفظ كصورة (JPG)</button>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar" id="doctorList"></div>
+        <div class="content-area">
+            <div id="printArea">
+                <h2 id="currentTitle" style="color: var(--primary); border-bottom: 1px solid #ddd; padding-bottom: 10px;">اختر طبيباً لعرض الحجوزات</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الدور</th>
+                            <th>اسم المريض</th>
+                            <th>العيادة/الطبيب</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resBody">
+                        <tr><td colspan="3" style="text-align:center;">برجاء اختيار طبيب من القائمة الجانبية</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // رابط الـ CSV الخاص بك من جوجل شيت
     const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0c_d872Pwd3J8f0E6J888snH1yiXfxAU8frZfHsmnXLLX8-71au8zedPQTa0itwXIsWQzs0aNZUS/pub?output=csv";
-    
     let allData = [];
     const doctors = [
         "د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)", "د. علي منتصر (مسالك بولية)",
@@ -95,13 +125,27 @@
         "د. جينا عبدالله الشافعي (اطفال)", "د. عزيز بدير (باطنة ومناظير)"
     ];
 
+    // دالة التحقق من تسجيل الدخول
+    function checkLogin() {
+        const user = document.getElementById('userInput').value;
+        const pass = document.getElementById('passInput').value;
+        
+        // يمكنك تغيير admin و kemo2026 من هنا
+        if(user === "admin" && pass === "kemo2026") {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'block';
+            init(); // تشغيل اللوحة بعد الدخول
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
     function init() {
-        // تحديث التاريخ
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('todayDate').innerText = new Date().toLocaleDateString('ar-EG', options);
         
-        // بناء قائمة الأطباء
         const list = document.getElementById('doctorList');
+        list.innerHTML = ""; // تنظيف القائمة
         doctors.forEach(doc => {
             const div = document.createElement('div');
             div.className = 'doc-item';
@@ -109,7 +153,6 @@
             div.onclick = () => filterByDoctor(doc, div);
             list.appendChild(div);
         });
-
         fetchData();
     }
 
@@ -120,10 +163,8 @@
             const rows = text.split('\n').slice(1);
             allData = rows.map(row => {
                 const cols = row.split(',');
-                // إضافة السطر بالكامل للمساعدة في التحقق من التاريخ
                 return { name: cols[0], day: cols[1], clinic: cols[2], doc: cols[3], time: cols[4], turn: cols[5], rawRow: row };
             }).filter(r => r.name);
-            
             updateMarquee();
         } catch (e) { console.error("خطأ في جلب البيانات"); }
     }
@@ -136,22 +177,13 @@
         }
     }
 
-    // دالة للتحقق من أن الحجز تم بتاريخ اليوم الفعلي
     function isTodayRecord(rowString) {
         if (!rowString) return false;
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
-        const m = String(today.getMonth() + 1);
-        const d = String(today.getDate());
-        
-        const variations = [
-            `${yyyy}/${mm}/${dd}`, `${yyyy}/${m}/${d}`,
-            `${dd}/${mm}/${yyyy}`, `${d}/${m}/${yyyy}`,
-            `${m}/${d}/${yyyy}`, `${mm}/${dd}/${yyyy}`,
-            `${yyyy}-${mm}-${dd}`
-        ];
+        const variations = [`${yyyy}/${mm}/${dd}`, `${dd}/${mm}/${yyyy}`, `${yyyy}-${mm}-${dd}`];
         return variations.some(v => rowString.includes(v));
     }
 
@@ -159,19 +191,11 @@
         document.querySelectorAll('.doc-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
         document.getElementById('currentTitle').innerText = "حجوزات: " + docName;
-        
         const daysAr = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
         const todayName = daysAr[new Date().getDay()];
-
         const filtered = allData.filter(r => {
-            const isDocMatch = r.doc && r.doc.trim() === docName.trim();
-            const isDayMatch = r.day && r.day.trim() === todayName;
-            // التحقق الإضافي من مطابقة تاريخ التسجيل لتاريخ اليوم
-            const isDateMatch = isTodayRecord(r.rawRow);
-            
-            return isDocMatch && isDayMatch && isDateMatch;
+            return r.doc && r.doc.trim() === docName.trim() && r.day && r.day.trim() === todayName && isTodayRecord(r.rawRow);
         });
-        
         renderTable(filtered, true);
     }
 
@@ -179,15 +203,7 @@
         const daysAr = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
         const todayName = daysAr[new Date().getDay()];
         document.getElementById('currentTitle').innerText = "كل حجوزات اليوم (" + todayName + ")";
-        
-        const filtered = allData.filter(r => {
-            const isDayMatch = r.day && r.day.trim() === todayName;
-            // التحقق الإضافي من مطابقة تاريخ التسجيل لتاريخ اليوم
-            const isDateMatch = isTodayRecord(r.rawRow);
-            
-            return isDayMatch && isDateMatch;
-        });
-        
+        const filtered = allData.filter(r => r.day && r.day.trim() === todayName && isTodayRecord(r.rawRow));
         renderTable(filtered, false);
     }
 
@@ -199,13 +215,7 @@
             return;
         }
         data.forEach(item => {
-            body.innerHTML += `
-                <tr>
-                    <td><span class="turn-no">${item.turn}</span></td>
-                    <td>${item.name}</td>
-                    <td>${showClinic ? item.day : item.doc}</td>
-                </tr>
-            `;
+            body.innerHTML += `<tr><td><span class="turn-no">${item.turn}</span></td><td>${item.name}</td><td>${showClinic ? item.day : item.doc}</td></tr>`;
         });
     }
 
@@ -218,8 +228,6 @@
             link.click();
         });
     }
-
-    window.onload = init;
 </script>
 
 </body>
