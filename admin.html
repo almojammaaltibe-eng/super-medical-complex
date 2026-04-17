@@ -120,7 +120,8 @@
             const rows = text.split('\n').slice(1);
             allData = rows.map(row => {
                 const cols = row.split(',');
-                return { name: cols[0], day: cols[1], clinic: cols[2], doc: cols[3], time: cols[4], turn: cols[5] };
+                // إضافة السطر بالكامل للمساعدة في التحقق من التاريخ
+                return { name: cols[0], day: cols[1], clinic: cols[2], doc: cols[3], time: cols[4], turn: cols[5], rawRow: row };
             }).filter(r => r.name);
             
             updateMarquee();
@@ -135,12 +136,42 @@
         }
     }
 
+    // دالة للتحقق من أن الحجز تم بتاريخ اليوم الفعلي
+    function isTodayRecord(rowString) {
+        if (!rowString) return false;
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const m = String(today.getMonth() + 1);
+        const d = String(today.getDate());
+        
+        const variations = [
+            `${yyyy}/${mm}/${dd}`, `${yyyy}/${m}/${d}`,
+            `${dd}/${mm}/${yyyy}`, `${d}/${m}/${yyyy}`,
+            `${m}/${d}/${yyyy}`, `${mm}/${dd}/${yyyy}`,
+            `${yyyy}-${mm}-${dd}`
+        ];
+        return variations.some(v => rowString.includes(v));
+    }
+
     function filterByDoctor(docName, el) {
         document.querySelectorAll('.doc-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
         document.getElementById('currentTitle').innerText = "حجوزات: " + docName;
         
-        const filtered = allData.filter(r => r.doc && r.doc.trim() === docName.trim());
+        const daysAr = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+        const todayName = daysAr[new Date().getDay()];
+
+        const filtered = allData.filter(r => {
+            const isDocMatch = r.doc && r.doc.trim() === docName.trim();
+            const isDayMatch = r.day && r.day.trim() === todayName;
+            // التحقق الإضافي من مطابقة تاريخ التسجيل لتاريخ اليوم
+            const isDateMatch = isTodayRecord(r.rawRow);
+            
+            return isDocMatch && isDayMatch && isDateMatch;
+        });
+        
         renderTable(filtered, true);
     }
 
@@ -149,7 +180,14 @@
         const todayName = daysAr[new Date().getDay()];
         document.getElementById('currentTitle').innerText = "كل حجوزات اليوم (" + todayName + ")";
         
-        const filtered = allData.filter(r => r.day && r.day.trim() === todayName);
+        const filtered = allData.filter(r => {
+            const isDayMatch = r.day && r.day.trim() === todayName;
+            // التحقق الإضافي من مطابقة تاريخ التسجيل لتاريخ اليوم
+            const isDateMatch = isTodayRecord(r.rawRow);
+            
+            return isDayMatch && isDateMatch;
+        });
+        
         renderTable(filtered, false);
     }
 
@@ -157,7 +195,7 @@
         const body = document.getElementById('resBody');
         body.innerHTML = '';
         if (data.length === 0) {
-            body.innerHTML = '<tr><td colspan="3" style="text-align:center;">لا توجد بيانات متاحة</td></tr>';
+            body.innerHTML = '<tr><td colspan="3" style="text-align:center;">لا توجد بيانات متاحة لهذا اليوم</td></tr>';
             return;
         }
         data.forEach(item => {
@@ -176,7 +214,6 @@
         html2canvas(element, { scale: 1.5 }).then(canvas => {
             const link = document.createElement('a');
             link.download = `حجوزات_${new Date().toLocaleDateString()}.jpg`;
-            // تحويل الصورة لـ JPG بجودة متوسطة (0.7)
             link.href = canvas.toDataURL("image/jpeg", 0.7);
             link.click();
         });
