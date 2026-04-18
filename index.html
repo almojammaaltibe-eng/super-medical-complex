@@ -190,23 +190,30 @@
             doctorName: document.getElementById('doctorName').value
         };
 
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(formData)
-            });
-
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('booking-form').style.display = 'none';
-            document.getElementById('res-name').innerText = formData.patientName;
-            document.getElementById('success-msg').style.display = 'block';
-        } catch (e) {
-            alert("خطأ في الإرسال، تأكد من الاتصال بالإنترنت");
-            document.getElementById('btn').style.display = 'block';
-            document.getElementById('loader').style.display = 'none';
-        }
+        // استبدل جزء الـ fetch داخل دالة submit بهذا الكود:
+try {
+    const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        // حذفنا mode: 'no-cors' لأننا فعلنا السماح في السكريبت
+        body: JSON.stringify(formData)
     });
+    
+    const resultData = await response.json(); // قراءة الرد (رقم الدور)
+    
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('booking-form').style.display = 'none';
+    document.getElementById('res-name').innerText = formData.patientName;
+    
+    // إضافة عرض رقم الدور
+    document.getElementById('success-msg').innerHTML += `<h2 style="color:red;">رقم دورك: ${resultData.turn}</h2>`;
+    document.getElementById('success-msg').style.display = 'block';
+    
+} catch (e) {
+    alert("خطأ في الاتصال بالسيرفر، يرجى المحاولة لاحقاً");
+    document.getElementById('btn').style.display = 'block';
+    document.getElementById('loader').style.display = 'none';
+}
+        });
 </script>
 </body>
 </html>
