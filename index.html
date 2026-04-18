@@ -57,7 +57,7 @@
         <form id="booking-form" autocomplete="off">
             <div class="form-group">
                 <label>اسم المريض:</label>
-                <input type="text" id="pName" required placeholder="الاسم الثلاثي" autocomplete="one-time-code">
+                <input type="text" id="pName" required placeholder="الاسم الثلاثي">
             </div>
             <div class="form-group">
                 <label>يوم الحجز:</label>
@@ -82,50 +82,29 @@
                 <button type="submit" class="submit-btn" id="btn">تأكيد الحجز</button>
                 <button type="button" class="cancel-btn" onclick="resetKimoForm()">إلغاء</button>
             </div>
-            <p id="loader" style="display:none; margin-top:15px;">جاري المعالجة... ⏳</p>
+            <p id="loader" style="display:none; margin-top:15px;">جاري إرسال البيانات... ⏳</p>
         </form>
 
         <div id="success-msg">
-            <h3 style="color:var(--success-color);">✅ تم الحجز بنجاح</h3>
+            <h3 style="color:var(--success-color);">✅ تم تسجيل الحجز بنجاح</h3>
             <p>المريض: <b id="res-name"></b></p>
             <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 5px;">يرجى تصوير الشاشة وإظهارها لموظف الاستقبال</p>
-            <p>رقم الدور: <b id="b-num" style="font-size:45px; display: block; margin: 10px 0;">0</b></p>
-            <p style="color: var(--cancel-color); font-size: 15px; font-weight: bold; margin-bottom: 20px;">سيتم إلغاء الحجز حين انتهاء وقت العيادة</p>
             <button onclick="location.reload()" class="cancel-btn">حجز جديد</button>
         </div>
     </div>
 
     <div class="side-panel">
         <h3>📍 تواصل معنا</h3>
-        <p style="line-height: 1.6; font-weight: 500;">
-            <strong>العنوان:</strong><br> شبراملس – امتداد شارع السوق - أعلي مسجد عباد الرحمن
-        </p>
-        <hr style="border: 0; border-top: 1px solid #cfd8dc; margin: 15px 0;">
         <p><strong>للحجز والاستفسار:</strong></p>
-        <ul style="list-style:none; padding:0; line-height:2; direction: ltr; text-align: right;">
+        <ul style="list-style:none; padding:0; line-height:2; text-align: right;">
             <li>01020580002 :واتساب</li>
             <li>01122593433 📲</li>
-            <li>0404650337 📞</li>
-            <li>0404658010 📞</li>
         </ul>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, query, getDocs, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    
-    const firebaseConfig = {
-        apiKey: "AIzaSyCghSGMQpRKBBWEvPsv50S0--bLr8mLTc",
-        authDomain: "shubra-mils-clinic.firebaseapp.com",
-        projectId: "shubra-mils-clinic",
-        storageBucket: "shubra-mils-clinic.firebasestorage.app",
-        messagingSenderId: "458397109437",
-        appId: "1:458397109437:web:f8987863f32e1dbdbc3bd4"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+<script>
+    const SCRIPT_URL = "YOUR_SCRIPT_URL_HERE"; // ضع رابط الـ Web App الخاص بك هنا
 
     const scheduleData = {
         "السبت": { "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], "مسالك": ["د. علي منتصر"], "أنف وأذن": ["د. محمد هيكل"], "عيون": ["أخصائي محمد مجدي سعده"] },
@@ -156,47 +135,33 @@
         }
     }
 
-    window.resetKimoForm = function() {
-        document.getElementById('booking-form').reset();
-    }
+    window.resetKimoForm = function() { document.getElementById('booking-form').reset(); }
 
-    const form = document.getElementById('booking-form');
-    form.addEventListener('submit', async (e) => {
+    document.getElementById('booking-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         document.getElementById('btn').style.display = 'none';
         document.getElementById('loader').style.display = 'block';
 
+        const formData = {
+            name: document.getElementById('pName').value,
+            day: document.getElementById('bDay').value,
+            specialty: document.getElementById('specialty').value,
+            doctor: document.getElementById('doctorName').value
+        };
+
         try {
-            const selectedSpec = document.getElementById('specialty').value;
-            const selectedDay = document.getElementById('bDay').value;
-
-            const q = query(
-                collection(db, "bookings"), 
-                where("specialty", "==", selectedSpec),
-                where("bookingDay", "==", selectedDay)
-            );
-            
-            const querySnapshot = await getDocs(q);
-            const count = querySnapshot.size + 1;
-
-            await addDoc(collection(db, "bookings"), {
-                patientName: document.getElementById('pName').value,
-                specialty: selectedSpec,
-                doctorName: document.getElementById('doctorName').value,
-                bookingDay: selectedDay,
-                orderNumber: count,
-                timestamp: serverTimestamp()
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(formData)
             });
 
             document.getElementById('loader').style.display = 'none';
-            form.style.display = 'none';
-            document.getElementById('res-name').innerText = document.getElementById('pName').value;
-            document.getElementById('b-num').innerText = count;
+            document.getElementById('booking-form').style.display = 'none';
+            document.getElementById('res-name').innerText = formData.name;
             document.getElementById('success-msg').style.display = 'block';
-
         } catch (e) {
-            console.error("Error:", e);
-            alert("خطأ في الاتصال");
+            alert("خطأ في الإرسال، تأكد من الاتصال بالإنترنت");
             document.getElementById('btn').style.display = 'block';
             document.getElementById('loader').style.display = 'none';
         }
