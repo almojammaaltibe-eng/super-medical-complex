@@ -192,27 +192,36 @@
 
         // استبدل جزء الـ fetch داخل دالة submit بهذا الكود:
 try {
-    const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        // حذفنا mode: 'no-cors' لأننا فعلنا السماح في السكريبت
-        body: JSON.stringify(formData)
-    });
-    
-    const resultData = await response.json(); // قراءة الرد (رقم الدور)
-    
-    document.getElementById('loader').style.display = 'none';
-    document.getElementById('booking-form').style.display = 'none';
-    document.getElementById('res-name').innerText = formData.patientName;
-    
-    // إضافة عرض رقم الدور
-    document.getElementById('success-msg').innerHTML += `<h2 style="color:red;">رقم دورك: ${resultData.turn}</h2>`;
-    document.getElementById('success-msg').style.display = 'block';
-    
-} catch (e) {
-    alert("خطأ في الاتصال بالسيرفر، يرجى المحاولة لاحقاً");
-    document.getElementById('btn').style.display = 'block';
-    document.getElementById('loader').style.display = 'none';
-}
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
+            
+            const resultData = await response.json(); // قراءة الرد (يحتوي الآن على رقم الدور واسم الطبيب)
+            
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('booking-form').style.display = 'none';
+            
+            // تحديث رسالة النجاح لتشمل البيانات الجديدة
+            const successDiv = document.getElementById('success-msg');
+            successDiv.innerHTML = `
+                <h3 style="color:var(--success-color);">✅ تم تسجيل الحجز بنجاح</h3>
+                <p>المريض: <b>${formData.patientName}</b></p>
+                <p>الطبيب: <b>${resultData.doctor}</b></p>
+                <div style="background: #e0f7fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                    <p style="margin:0; font-size: 18px;">رقم دورك هو:</p>
+                    <h1 style="color:var(--primary-color); margin: 5px 0;">${resultData.turn}</h1>
+                </div>
+                <p style="font-weight: bold;">يرجى تصوير الشاشة وإظهارها لموظف الاستقبال</p>
+                <button onclick="location.reload()" class="cancel-btn">حجز جديد</button>
+            `;
+            successDiv.style.display = 'block';
+            
+        } catch (e) {
+            alert("خطأ في الاتصال، تأكد من الاتصال بالإنترنت");
+            document.getElementById('btn').style.display = 'block';
+            document.getElementById('loader').style.display = 'none';
+        }
         });
 </script>
 </body>
