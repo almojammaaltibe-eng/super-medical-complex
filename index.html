@@ -3,136 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مجمع شبراملس الطبي</title>
+    <title>حجوزات مجمع شبراملس الطبي</title>
+
+    <meta property="og:title" content="حجوزات مجمع شبراملس الطبي">
+    <meta property="og:description" content="احجز موعدك الآن بكل سهولة. طوارئ ومعمل 24 ساعة، ونخبة من أفضل الأطباء المتخصصين لخدمتك.">
+    <meta property="og:image" content="https://github.com/abdoelhakimelsisi1973-dot/Shubra-Mils-Medical-Polyclinic/blob/main/logo.png?raw=true"> 
+    <meta property="og:url" content="https://abdoelhakimelsisi1973-dot.github.io/Shubra-Mils-Medical-Polyclinic/">
+    <meta property="og:type" content="website">
+
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-color: #0097a7; --accent-color: #00bcd4; --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); --card-bg: rgba(255, 255, 255, 0.95); --success-color: #2e7d32; --cancel-color: #d32f2f; }
-        body { font-family: 'Tajawal', sans-serif; background: var(--bg-gradient); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
-        .container { background: var(--card-bg); border-radius: 30px; padding: 40px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.15); border-top: 8px solid var(--primary-color); width: 100%; max-width: 600px; }
-        .main-logo { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--accent-color); margin-bottom: 20px; }
-        .form-group { margin-bottom: 20px; text-align: right; }
-        label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--primary-color); }
-        input, select { width: 100%; padding: 12px; border: 2px solid #cfd8dc; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
-        .button-group { display: flex; gap: 10px; margin-top: 20px; }
-        .submit-btn { flex: 2; padding: 15px; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; }
-        .cancel-btn { flex: 1; padding: 15px; background: #eee; border: none; border-radius: 10px; cursor: pointer; }
-        #success-msg, #loader { display: none; }
+        :root {
+            --primary-color: #0097a7; 
+            --accent-color: #00bcd4;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --success-color: #2e7d32;
+            --cancel-color: #d32f2f;
+            --text-dark: #2c3e50;
+        }
+
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        .news-ticker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 6px 0;
+            overflow: hidden;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .ticker-text {
+            display: inline-block;
+            white-space: nowrap;
+            font-size: 15px;
+            font-weight: 700;
+            animation: marquee 25s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(-100vw); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .main-wrapper { 
+            display: grid; 
+            grid-template-columns: 350px 1fr 350px; 
+            gap: 25px; 
+            max-width: 1500px; 
+            width: 100%; 
+            margin-top: 20px;
+        }
+
+        .side-panel { 
+            background: var(--card-bg); 
+            border-radius: 25px; 
+            padding: 30px; 
+            height: fit-content; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .side-panel:hover { transform: translateY(-5px); }
+
+        .side-panel h3 { 
+            color: var(--primary-color); 
+            font-size: 24px; 
+            margin-bottom: 20px; 
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .info-list { list-style: none; padding: 0; }
+        .info-list li { 
+            font-size: 18px; 
+            font-weight: 500;
+            margin-bottom: 15px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+        }
+
+        .container { 
+            background: var(--card-bg); 
+            border-radius: 30px; 
+            padding: 40px; 
+            text-align: center; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            border-top: 8px solid var(--primary-color);
+        }
+
+        .main-logo { 
+            width: 150px; 
+            height: 150px; 
+            border-radius: 50%; 
+            border: 4px solid var(--accent-color); 
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 { color: var(--primary-color); font-size: 32px; font-weight: 800; margin: 0; }
+        .subtitle { color: #546e7a; font-size: 18px; margin-bottom: 30px; }
+
+        .form-group { margin-bottom: 25px; text-align: right; }
+        label { display: block; margin-bottom: 10px; font-weight: 700; font-size: 16px; color: var(--primary-color); }
+        
+        input, select { 
+            width: 100%; 
+            padding: 16px; 
+            border: 2px solid #cfd8dc; 
+            border-radius: 15px; 
+            font-family: 'Tajawal'; 
+            font-size: 17px; 
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus { border-color: var(--accent-color); outline: none; box-shadow: 0 0 10px rgba(0,188,212,0.2); }
+
+        .button-group { display: flex; gap: 15px; margin-top: 30px; }
+        
+        .submit-btn { 
+            flex: 2;
+            padding: 18px; 
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color)); 
+            color: white; 
+            border: none; 
+            border-radius: 15px; 
+            font-size: 20px; 
+            font-weight: 800; 
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,151,167,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn { 
+            flex: 1;
+            padding: 18px; 
+            background: #eceff1; 
+            color: var(--cancel-color); 
+            border: 2px solid var(--cancel-color); 
+            border-radius: 15px; 
+            font-size: 18px; 
+            font-weight: 700; 
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #success-msg { display: none; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .booking-num { font-size: 60px; color: var(--success-color); font-weight: 900; }
+
+        @media (max-width: 1100px) { 
+            .main-wrapper { grid-template-columns: 1fr; } 
+            .side-panel { order: 2; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>مجمع شبراملس الطبي</h2>
-    <form id="booking-form">
-        <div class="form-group">
-            <label>اسم المريض:</label>
-            <input type="text" id="pName" required placeholder="الاسم الثلاثي">
-        </div>
-        <div class="form-group">
-            <label>يوم الحجز:</label>
-            <select id="bDay" required onchange="updateSpecialties()">
-                <option value="">اختر اليوم...</option>
-                <option value="السبت">السبت</option><option value="الأحد">الأحد</option><option value="الإثنين">الإثنين</option><option value="الثلاثاء">الثلاثاء</option><option value="الأربعاء">الأربعاء</option><option value="الخميس">الخميس</option><option value="الجمعة">الجمعة</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>العيادة:</label>
-            <select id="specialty" required onchange="updateDoctors()">
-                <option value="">اختر اليوم أولاً...</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>الطبيب:</label>
-            <select id="doctorName" required>
-                <option value="">اختر العيادة أولاً...</option>
-            </select>
-        </div>
-        <div class="button-group">
-            <button type="submit" class="submit-btn" id="btn">تأكيد الحجز</button>
-            <button type="button" class="cancel-btn" onclick="location.reload()">إلغاء</button>
-        </div>
-        <p id="loader">جاري الإرسال... ⏳</p>
-    </form>
+<div class="news-ticker">
+    <div class="ticker-text">
+        مازالت عروض الإثنين الأبيض مستمرة &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 50 في الميه تخفيضات على جميع التحاليل
+    </div>
+</div>
 
-    <div id="success-msg">
-        <h3 style="color:var(--success-color);">✅ تم تسجيل الحجز بنجاح</h3>
-        <p>المريض: <b id="res-name"></b></p>
-        <p>الطبيب: <b id="res-doc"></b></p>
-        <div style="background: #e0f7fa; padding: 15px; border-radius: 10px; margin: 10px 0;">
-            <p>رقم دورك هو:</p>
-            <h1 style="color:var(--primary-color);" id="res-turn"></h1>
+<div class="main-wrapper">
+    <div class="side-panel">
+        <h3>خدماتنا المتميزة ✨</h3>
+        <ul class="info-list">
+            <li><span>🚑</span> طوارئ متوفرة 24 ساعة</li>
+            <li><span>🧪</span> المعمل متوفر 24 ساعة</li>
+            <li><span>👨‍⚕️</span> نخبة من الأطباء المتخصصين</li>
+            <li><span>🏢</span> رعاية طبية متكاملة</li>
+            <li><span>💳</span> خصومات خاصة لحاملي بطاقاتنا</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="main-logo">
+        <h2>مجمع شبراملس الطبي</h2>
+        <p class="subtitle">رعايتكم هي أولويتنا القصوى</p>
+        
+        <form id="booking-form">
+            <div class="form-group">
+                <label>اسم المريض:</label>
+                <input type="text" id="pName" name="patientName" required placeholder="يرجى كتابة الاسم الثلاثي">
+            </div>
+            <div class="form-group">
+                <label>يوم الحجز:</label>
+                <select id="bDay" name="bookingDay" required onchange="updateSpecialties()">
+                    <option value="">اختر اليوم المناسب لك...</option>
+                    <option value="السبت">السبت</option>
+                    <option value="الأحد">الأحد</option>
+                    <option value="الإثنين">الإثنين</option>
+                    <option value="الثلاثاء">الثلاثاء</option>
+                    <option value="الأربعاء">الأربعاء</option>
+                    <option value="الخميس">الخميس</option>
+                    <option value="الجمعة">الجمعة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>العيادة:</label>
+                <select id="specialty" name="specialty" required onchange="updateDoctors()">
+                    <option value="">يرجى اختيار اليوم أولاً...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>الطبيب المتخصص:</label>
+                <select id="doctorName" name="doctorName" required>
+                    <option value="">يرجى اختيار العيادة أولاً...</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="submit-btn" id="btn">تأكيد الحجز الآن</button>
+                <button type="button" class="cancel-btn" onclick="resetKimoForm()">إلغاء</button>
+            </div>
+            <p id="loader" style="display:none; color:var(--primary-color); font-weight:bold; margin-top:15px;">جاري معالجة طلبك... ⏳</p>
+        </form>
+
+        <div id="success-msg">
+            <div style="font-size: 50px;">✅</div>
+            <h3 style="color:var(--success-color); font-size: 28px;">تم تأكيد حجزك بنجاح</h3>
+            <p style="font-size: 18px;">المريض: <b id="res-name"></b></p>
+            <p style="font-size: 18px;">الموعد: <b id="res-day"></b> - <b id="res-doc"></b></p>
+            <div style="margin:20px 0; padding: 20px; background: #f1f8e9; border-radius: 20px;">
+                <span style="font-size:16px; color:#555; display:block;">رقم حجزك في العيادة هو</span>
+                <span class="booking-num" id="b-num">0</span>
+            </div>
+            <p style="color:var(--cancel-color); font-weight:bold;">يرجى الحضور قبل الموعد بـ 15 دقيقة</p>
+            <p style="color:var(--cancel-color); font-weight:bold;">يرجى تصوير الشاشة وإظهارها لموظف الاستقبال</p>
+            <button onclick="location.reload()" class="cancel-btn" style="width:100%; margin-top:10px;">حجز جديد</button>
         </div>
-        <button onclick="location.reload()" class="submit-btn">حجز جديد</button>
+    </div>
+
+    <div class="side-panel">
+        <h3>📍 تواصل معنا</h3>
+        <ul class="info-list">
+            <li><span>📍</span> شبراملس – أعلى مسجد عباد الرحمن</li>
+            <li><span>🟢</span> واتساب: 01020580002</li>
+            <li><span>📲</span> موبايل: 01122593433</li>
+            <li><span>📞</span> أرضي: 0404650337</li>
+        </ul>
+        <div style="margin-top:20px; padding:15px; background:#e0f7fa; border-radius:15px; font-size:14px;">
+            📢 متاحون لخدمتكم طوال أيام الأسبوع
+        </div>
     </div>
 </div>
 
 <script>
-    // ضع رابط السكربت الخاص بك هنا
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5aI4G2bgiis5I8G2uwhgv93duRxiD7KPaAsrisgp96i8BKJMgfC1bL4Tm9gqGzjefeA/exec";
+const constantServices = { 
+    "طوارئ 24 ساعة": ["طبيب الطوارئ المناوب"], 
+    "معمل التحاليل": ["د. ثريا القاضي", "د. فريال محمود رزق"] 
+};
 
-    const scheduleData = {
-        "السبت": { "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"], "أنف وأذن وحنجرة": ["د. محمد هيكل (07:00 مساءً)"], "عيون": ["د. محمد مجدي سعده (02:00 ظهراً)"] },
-        "الأحد": { "قلب وأوعية": ["د. أحمد مسعد الغلبان (06:00 مساءً)"], "أسنان": ["د. محمد علاء (03:00 مساءً)", "د. محمود دهب (08:00 مساءً)"], "عيون": ["د. خالد أحمد الشيخ (05:00 عصراً)"], "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"], "عظام": ["د. إبراهيم مطاوع (04:00 عصراً)"] },
-        "الإثنين": { "نساء وتوليد": ["د. هيام السمراوي (01:00 ظهراً)"], "جراحة مخ وأعصاب": ["د. محمد سلام (08:00 مساءً)"], "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"], "أطفال وحديثي الولاده": ["د. جينا عبدالله الشافعي (06:00 مساءً)"] },
-        "الثلاثاء": { "أنف وأذن وحنجرة": ["د. سناء الحماقي (04:00 مساءً)"], "نفسية وعصبية": ["د. آلاء الحوت (06:00 مساءً)"], "أسنان": ["د. محمد علاء (03:00 مساءً)", "د. محمود دهب (08:00 مساءً)"], "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"], "عظام": ["د. إبراهيم مطاوع (04:00 عصراً)"], "عيون": ["د. محمد مجدي سعده (02:00 ظهراً)"] },
-        "الأربعاء": { "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], "قلب وأوعية": ["د. أحمد مسعد الغلبان (06:00 مساءً)"], "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"], "أطفال وحديثي الولاده": ["د. جينا عبدالله الشافعي (06:00 مساءً)"] },
-        "الخميس": { "قلب وأوعية": ["د. أحمد مسعد الغلبان (06:00 مساءً)"], "أنف وأذن وحنجرة": ["د. محمد هيكل (07:00 مساءً)"], "أسنان": ["د. محمد علاء (03:00 مساءً)", "د. محمود دهب (08:00 مساءً)"], "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"], "عظام": ["د. إبراهيم مطاوع (04:00 عصراً)"], "عيون": ["د. محمد مجدي سعده (02:00 ظهراً)"], "صدر": ["د. أسامة الخشن (05:00 عصراً)"] },
-        "الجمعة": { "باطنة ومناظير": ["د. عزيز بدير (02:00 ظهراً)"] }
+const scheduleData = {
+        "السبت": { 
+            "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], 
+            "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"], 
+            "أنف وأذن وحنجرة": ["د. محمد هيكل (07:00 مساءً)"], 
+            "عيون": ["د. محمد مجدي سعده (02:00 ظهراً)"] 
+        },
+        "الأحد": { 
+            "قلب وأوعية": ["د. أحمد مسعد الغلبان (06:00 مساءً)"], 
+            "أسنان": ["د. محمد علاء (03:00 مساءً)", "د. محمود دهب (08:00 مساءً)"], 
+            "عيون": ["د. خالد أحمد الشيخ (05:00 عصراً)"], 
+            "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"],
+            "عظام": ["د. إبراهيم مطاوع (04:00 عصراً)"]
+        },
+        "الإثنين": { 
+            "نساء وتوليد": ["د. هيام السمراوي (01:00 ظهراً)"], 
+            "جراحة مخ وأعصاب": ["د. محمد سلام (08:00 مساءً)"], 
+            "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"],
+            "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"],
+            "أطفال وحديثي الولاده": ["د. جينا عبدالله الشافعي (06:00 مساءً)"]
+        },
+        "الثلاثاء": { 
+            "أنف وأذن وحنجرة": ["د. سناء الحماقي (04:00 مساءً)"], 
+            "نفسية وعصبية": ["د. آلاء الحوت (06:00 مساءً)"], 
+            "أسنان": ["د. محمد علاء (03:00 مساءً)", "د. محمود دهب (08:00 مساءً)"], 
+            "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"],
+            "عظام": ["د. إبراهيم مطاوع (04:00 عصراً)"],
+            "عيون": ["د. محمد مجدي سعده (02:00 ظهراً)"]
+        },
+        "الأربعاء": { 
+            "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], 
+            "قلب وأوعية": ["د. أحمد مسعد الغلبان (06:00 مساءً)"], 
+            "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"],
+            "أطفال وحديثي الولاده": ["د. جينا عبدالله الشافعي (06:00 مساءً)"]
+        },
+        "الخميس": { 
+            "قلب وأوعية": ["د. أحمد مسعد الغلبان (06:00 مساءً)"],
+            "أنف وأذن وحنجرة": ["د. محمد هيكل (07:00 مساءً)"],
+            "أسنان": ["د. محمد علاء (03:00 مساءً)", "د. محمود دهب (08:00 مساءً)"],
+            "مسالك بولية": ["د. علي منتصر (07:00 مساءً)"],
+            "عظام": ["د. إبراهيم مطاوع (04:00 عصراً)"],
+            "عيون": ["د. محمد مجدي سعده (02:00 ظهراً)"],
+            "صدر": ["د. أسامة الخشن (05:00 عصراً)"]
+        },
+        "الجمعة": { 
+            "باطنة ومناظير": ["د. عزيز بدير (02:00 ظهراً)"] 
+        }
     };
 
-    window.updateSpecialties = function() {
-        const day = document.getElementById('bDay').value;
-        const specSelect = document.getElementById('specialty');
-        const docSelect = document.getElementById('doctorName');
-        specSelect.innerHTML = '<option value="">اختر العيادة...</option>';
-        docSelect.innerHTML = '<option value="">اختر العيادة أولاً...</option>';
-        if(day && scheduleData[day]) {
-            Object.keys(scheduleData[day]).forEach(s => specSelect.add(new Option(s, s)));
-        }
+function updateSpecialties() {
+    const day = document.getElementById('bDay').value;
+    const specSelect = document.getElementById('specialty');
+    specSelect.innerHTML = '<option value="">اختر العيادة...</option>';
+    if(day) {
+        Object.keys(constantServices).forEach(s => specSelect.add(new Option(s, s)));
+        if(scheduleData[day]) Object.keys(scheduleData[day]).forEach(s => specSelect.add(new Option(s, s)));
     }
+}
 
-    window.updateDoctors = function() {
-        const day = document.getElementById('bDay').value;
-        const spec = document.getElementById('specialty').value;
-        const docSelect = document.getElementById('doctorName');
-        docSelect.innerHTML = '<option value="">اختر الطبيب...</option>';
-        if(day && spec && scheduleData[day][spec]) {
-            scheduleData[day][spec].forEach(d => docSelect.add(new Option(d, d)));
-        }
+function updateDoctors() {
+    const day = document.getElementById('bDay').value;
+    const spec = document.getElementById('specialty').value;
+    const docSelect = document.getElementById('doctorName');
+    docSelect.innerHTML = '<option value="">اختر الطبيب...</option>';
+    let list = constantServices[spec] || (scheduleData[day] ? scheduleData[day][spec] : null);
+    if(list) list.forEach(d => docSelect.add(new Option(d, d)));
+}
+
+function resetKimoForm() {
+    if(confirm("هل تريد بالتأكيد مسح كافة البيانات المدخلة؟")) {
+        document.getElementById('booking-form').reset();
+        document.getElementById('specialty').innerHTML = '<option value="">يرجى اختيار اليوم أولاً...</option>';
+        document.getElementById('doctorName').innerHTML = '<option value="">يرجى اختيار العيادة أولاً...</option>';
     }
+}
 
-    document.getElementById('booking-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        document.getElementById('btn').style.display = 'none';
-        document.getElementById('loader').style.display = 'block';
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwzVo2w7Jjzjo5icuSgXV4fj6BJGu2gdcVSZBHcss6heWriEXtGt7AMoFJTpnYrfvdC-w/exec';
+const form = document.getElementById('booking-form');
 
-        const formData = {
-            patientName: document.getElementById('pName').value,
-            bookingDay: document.getElementById('bDay').value,
-            specialty: document.getElementById('specialty').value,
-            doctorName: document.getElementById('doctorName').value
-        };
+form.addEventListener('submit', e => {
+    e.preventDefault();
+    document.getElementById('btn').style.display = 'none';
+    document.getElementById('loader').style.display = 'block';
 
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(formData)
-            });
-            const result = await response.json();
-            
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('booking-form').style.display = 'none';
-            
-            document.getElementById('res-name').innerText = formData.patientName;
-            document.getElementById('res-doc').innerText = result.doctor; // تأكد أن السكربت يرسل doctor
-            document.getElementById('res-turn').innerText = result.turn;
-            document.getElementById('success-msg').style.display = 'block';
-        } catch (e) {
-            alert("حدث خطأ، يرجى المحاولة لاحقاً");
-            document.getElementById('btn').style.display = 'block';
-            document.getElementById('loader').style.display = 'none';
+    const pName = document.getElementById('pName').value;
+    const bDay = document.getElementById('bDay').value;
+    const doctor = document.getElementById('doctorName').value;
+    const spec = document.getElementById('specialty').value;
+
+    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+    .then(() => {
+        document.getElementById('loader').style.display = 'none';
+        form.style.display = 'none';
+        
+        const todayStr = new Date().toLocaleDateString();
+        let dailyCounts = {};
+        
+        if (localStorage.getItem('bDate') === todayStr) {
+            let stored = localStorage.getItem('dailyCounts');
+            if (stored) dailyCounts = JSON.parse(stored);
+        } else {
+            localStorage.setItem('bDate', todayStr);
         }
-    });
+        
+        let count = (dailyCounts[spec] || 0) + 1;
+        dailyCounts[spec] = count;
+        localStorage.setItem('dailyCounts', JSON.stringify(dailyCounts));
+
+        document.getElementById('res-name').innerText = pName;
+        document.getElementById('res-day').innerText = bDay;
+        document.getElementById('res-doc').innerText = doctor;
+        document.getElementById('b-num').innerText = count;
+        document.getElementById('success-msg').style.display = 'block';
+
+
+    })
+    .catch(() => { alert('حدث خطأ! يرجى المحاولة مرة أخرى.'); document.getElementById('btn').style.display = 'block'; });
+});
 </script>
 </body>
 </html>
