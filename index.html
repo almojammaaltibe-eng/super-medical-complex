@@ -18,7 +18,6 @@
         .news-ticker { position: absolute; top: 0; left: 0; width: 100%; background-color: var(--primary-color); color: #fff; padding: 6px 0; overflow: hidden; z-index: 1000; }
         .ticker-text { display: inline-block; white-space: nowrap; font-size: 15px; font-weight: 700; animation: marquee 25s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(-100vw); } 100% { transform: translateX(100vw); } }
-        
         .main-wrapper { display: grid; grid-template-columns: 1fr 1.8fr 1fr; gap: 25px; max-width: 1500px; width: 100%; margin-top: 20px; }
         .side-panel { background: var(--card-bg); border-radius: 25px; padding: 30px; height: fit-content; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
         .side-panel h3 { color: var(--primary-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
@@ -83,14 +82,14 @@
                 <button type="submit" class="submit-btn" id="btn">تأكيد الحجز</button>
                 <button type="button" class="cancel-btn" onclick="resetKimoForm()">إلغاء</button>
             </div>
-            <p id="loader" style="display:none; margin-top:15px;">جاري إرسال الحجز... ⏳</p>
+            <p id="loader" style="display:none; margin-top:15px;">جاري المعالجة... ⏳</p>
         </form>
 
         <div id="success-msg">
             <h3 style="color:var(--success-color);">✅ تم الحجز بنجاح</h3>
             <p>المريض: <b id="res-name"></b></p>
             <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 5px;">يرجى تصوير الشاشة وإظهارها لموظف الاستقبال</p>
-            <p>رقم الدور التقريبي: <b id="b-num" style="font-size:45px; display: block; margin: 10px 0;">0</b></p>
+            <p>رقم الدور: <b id="b-num" style="font-size:45px; display: block; margin: 10px 0;">0</b></p>
             <p style="color: var(--cancel-color); font-size: 15px; font-weight: bold; margin-bottom: 20px;">سيتم إلغاء الحجز حين انتهاء وقت العيادة</p>
             <button onclick="location.reload()" class="cancel-btn">حجز جديد</button>
         </div>
@@ -112,56 +111,31 @@
     </div>
 </div>
 
-<script>
-    // رابط جوجل شيت (الوسيط)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyQgKskqkUuiX_kZLjwZk8mKvyfFbQF7QMuE0-i2-z0rR61VE0TooLC5HRk_a3qvbvHFg/exec';
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, query, getDocs, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCghSGMQpRKBBWEvPsv50S0--bLr8mLTc",
+        authDomain: "shubra-mils-clinic.firebaseapp.com",
+        projectId: "shubra-mils-clinic",
+        storageBucket: "shubra-mils-clinic.firebasestorage.app",
+        messagingSenderId: "458397109437",
+        appId: "1:458397109437:web:f8987863f32e1dbdbc3bd4"
+    };
 
-const scheduleData = {
-    "السبت": { 
-        "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], 
-        "مسالك": ["د. علي منتصر (مسالك بولية)"], 
-        "أنف وأذن": ["د. محمد هيكل (أنف وأذن وحنجرة)"], 
-        "عيون": ["محمد مجدي سعده (عيون)"] 
-    },
-    "الأحد": { 
-        "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], 
-        "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], 
-        "عيون": ["د. خالد أحمد الشيخ (رمد)"], 
-        "عظام": ["د. إبراهيم مطاوع (عظام وعمود فقري)"],
-        "مسالك": ["د. علي منتصر (مسالك بولية)"]
-    },
-    "الإثنين": { 
-        "نساء": ["د. هيام السمراوي (نساء وتوليد)"], 
-        "مخ وأعصاب": ["د. محمد سلام (مخ وأعصاب)"], 
-        "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"],
-        "مسالك": ["د. علي منتصر (مسالك بولية)"]
-    },
-    "الثلاثاء": { 
-        "نفسية": ["د. آلاء الحوت (نفسية وعصبية)"], 
-        "أنف وأذن": ["د. سناء الحماقي (أنف وأذن)"],
-        "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], 
-        "عظام": ["د. إبراهيم مطاوع (عظام وعمود فقري)"],
-        "عيون": ["محمد مجدي سعده (عيون)"],
-        "مسالك": ["د. علي منتصر (مسالك بولية)"]
-    },
-    "الأربعاء": { 
-        "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], 
-        "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], 
-        "اطفال": ["د. جينا عبدالله الشافعي (اطفال)"],
-        "مسالك": ["د. علي منتصر (مسالك بولية)"]
-    },
-    "الخميس": { 
-        "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], 
-        "أنف وأذن": ["د. محمد هيكل (أنف وأذن وحنجرة)"], 
-        "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"],
-        "عظام": ["د. إبراهيم مطاوع (عظام وعمود فقري)"],
-        "عيون": ["محمد مجدي سعده (عيون)"],
-        "مسالك": ["د. علي منتصر (مسالك بولية)"]
-    },
-    "الجمعة": { 
-        "باطنة ومناظير": ["د. عزيز بدير (باطنة ومناظير)"] 
-    }
-};
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const scheduleData = {
+        "السبت": { "أسنان": ["د. رنا حمودة (04:00 عصراً)", "د. خالد الداهس (09:00 مساءً)"], "مسالك": ["د. علي منتصر"], "أنف وأذن": ["د. محمد هيكل"], "عيون": ["أخصائي محمد مجدي سعده"] },
+        "الأحد": { "قلب": ["د. أحمد مسعد الغلبان"], "أسنان": ["د. محمد علاء", "د. محمود دهب"], "عيون": ["أخصائي د. خالد الشيخ"], "عظام": ["أخصائي إبراهيم مطاوع"] },
+        "الإثنين": { "نساء": ["د. هيام السمراوي"], "مخ وأعصاب": ["د. محمد سلام"], "أسنان": ["د. رنا حمودة", "د. خالد الداهس"] },
+        "الثلاثاء": { "نفسية": ["د. آلاء الحوت"], "أسنان": ["د. محمد علاء", "د. محمود دهب"], "عظام": ["أخصائي إبراهيم مطاوع"] },
+        "الأربعاء": { "أسنان": ["د. رنا حمودة", "د. خالد الداهس"], "قلب": ["د. أحمد مسعد الغلبان"], "اطفال": ["د. جينا عبدالله الشافعي"] },
+        "الخميس": { "صدر": ["د. أسامة الخشن (05:00 عصراً)"], "قلب": ["د. أحمد مسعد الغلبان"], "أنف وأذن": ["د. محمد هيكل"], "عظام": ["أخصائي إبراهيم مطاوع"] },
+        "الجمعة": { "باطنة ومناظير": ["د. عزيز بدير (02:00 ظهراً)"] }
+    };
 
     window.updateSpecialties = function() {
         const day = document.getElementById('bDay').value;
@@ -187,44 +161,45 @@ const scheduleData = {
     }
 
     const form = document.getElementById('booking-form');
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         document.getElementById('btn').style.display = 'none';
         document.getElementById('loader').style.display = 'block';
 
-        const formData = {
-            patientName: document.getElementById('pName').value,
-            bookingDay: document.getElementById('bDay').value,
-            specialty: document.getElementById('specialty').value,
-            doctorName: document.getElementById('doctorName').value
-        };
+        try {
+            const selectedSpec = document.getElementById('specialty').value;
+            const selectedDay = document.getElementById('bDay').value;
 
-        // إرسال البيانات إلى جوجل شيت
-        fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors', // لضمان التوافق مع إرسال جوجل شيت
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        })
-        .then(response => {
-            // بما أننا نستخدم no-cors، لن نحصل على رد "Success" مباشر ولكن العملية ستتم
+            const q = query(
+                collection(db, "bookings"), 
+                where("specialty", "==", selectedSpec),
+                where("bookingDay", "==", selectedDay)
+            );
+            
+            const querySnapshot = await getDocs(q);
+            const count = querySnapshot.size + 1;
+
+            await addDoc(collection(db, "bookings"), {
+                patientName: document.getElementById('pName').value,
+                specialty: selectedSpec,
+                doctorName: document.getElementById('doctorName').value,
+                bookingDay: selectedDay,
+                orderNumber: count,
+                timestamp: serverTimestamp()
+            });
+
             document.getElementById('loader').style.display = 'none';
             form.style.display = 'none';
-            document.getElementById('res-name').innerText = formData.patientName;
-            
-            // توليد رقم دور عشوائي بسيط للمريض في الصفحة (لأن الرقم الحقيقي سيظهر في الشيت)
-            const count = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('res-name').innerText = document.getElementById('pName').value;
             document.getElementById('b-num').innerText = count;
-            
             document.getElementById('success-msg').style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error!', error.message);
-            alert("حدث خطأ أثناء إرسال البيانات، يرجى المحاولة لاحقاً.");
+
+        } catch (e) {
+            console.error("Error:", e);
+            alert("خطأ في الاتصال");
             document.getElementById('btn').style.display = 'block';
             document.getElementById('loader').style.display = 'none';
-        });
+        }
     });
 </script>
 </body>
