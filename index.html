@@ -89,6 +89,7 @@
         <div id="success-msg">
             <h3 style="color:var(--success-color);">✅ تم الحجز بنجاح</h3>
             <p>المريض: <b id="res-name"></b></p>
+            <p>الطبيب: <b id="res-doc"></b></p>
             <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 5px;">يرجى تصوير الشاشة وإظهارها لموظف الاستقبال</p>
             <p>رقم الدور التقريبي: <b id="b-num" style="font-size:45px; display: block; margin: 10px 0;">0</b></p>
             <p style="color: var(--cancel-color); font-size: 15px; font-weight: bold; margin-bottom: 20px;">سيتم إلغاء الحجز حين انتهاء وقت العيادة</p>
@@ -113,57 +114,20 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwLiPfL8kapt-TfzbCkpQk6eZIfuKoFsd7F38I8zFUArlTBpDs3WhJSWxj7Y7dNcnNhyA/exec';
+    // الرابط الجديد الخاص بك
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyLf39cWcKOwOgXfE-A51NbXLPnNatwq-22Bm7IGDJvjjINsqkJLWMFtVtjAkDA47jdVQ/exec';
 
     const scheduleData = {
-        "السبت": { 
-            "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], 
-            "مسالك": ["د. علي منتصر (مسالك بولية)"], 
-            "أنف وأذن": ["د. محمد هيكل (أنف وأذن وحنجرة)"], 
-            "عيون": ["محمد مجدي سعده (عيون)"]
-        },
-        "الأحد": { 
-            "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], 
-            "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], 
-            "عيون": ["د. خالد أحمد الشيخ (رمد)"], 
-            "عظام": ["د.إبراهيم مطاوع (عظام وعمود فقري)"],
-            "مسالك": ["د. علي منتصر (مسالك بولية)"]
-        },
-        "الإثنين": { 
-            "نساء": ["د. هيام السمراوي (نساء وتوليد)"], 
-            "مخ وأعصاب": ["د. محمد سلام (مخ وأعصاب)"], 
-            "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"],
-            "مسالك": ["د. علي منتصر (مسالك بولية)"]
-        },
-        "الثلاثاء": { 
-            "نفسية": ["د. آلاء الحوت (نفسية وعصبية)"], 
-            "أنف وأذن": ["د. سناء الحماقي (أنف وأذن)"],
-            "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], 
-            "عظام": ["إبراهيم مطاوع (عظام وعمود فقري)"],
-            "عيون": ["محمد مجدي سعده (عيون)"],
-            "مسالك": ["د. علي منتصر (مسالك بولية)"]
-        },
-        "الأربعاء": { 
-            "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], 
-            "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], 
-            "اطفال": ["د. جينا عبدالله الشافعي (اطفال)"],
-            "مسالك": ["د. علي منتصر (مسالك بولية)"]
-        },
-        "الخميس": { 
-            "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], 
-            "أنف وأذن": ["د. محمد هيكل (أنف وأذن وحنجرة)"], 
-            "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"],
-            "عظام": ["إبراهيم مطاوع (عظام وعمود فقري)"],
-            "عيون": ["محمد مجدي سعده (عيون)"],
-            "مسالك": ["د. علي منتصر (مسالك بولية)"],
-            "صدر": ["د. أسامة الخشن (اخصائي الصدر - 05:00 عصرا)"]
-        },
-        "الجمعة": { 
-            "باطنة ومناظير": ["د. عزيز بدير (باطنة ومناظير)"] 
-        }
+        "السبت": { "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], "مسالك": ["د. علي منتصر (مسالك بولية)"], "أنف وأذن": ["د. محمد هيكل (أنف وأذن وحنجرة)"], "عيون": ["محمد مجدي سعده (عيون)"] },
+        "الأحد": { "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], "عيون": ["د. خالد أحمد الشيخ (رمد)"], "عظام": ["د.إبراهيم مطاوع (عظام وعمود فقري)"], "مسالك": ["د. علي منتصر (مسالك بولية)"] },
+        "الإثنين": { "نساء": ["د. هيام السمراوي (نساء وتوليد)"], "مخ وأعصاب": ["د. محمد سلام (مخ وأعصاب)"], "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], "مسالك": ["د. علي منتصر (مسالك بولية)"] },
+        "الثلاثاء": { "نفسية": ["د. آلاء الحوت (نفسية وعصبية)"], "أنف وأذن": ["د. سناء الحماقي (أنف وأذن)"], "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], "عظام": ["إبراهيم مطاوع (عظام وعمود فقري)"], "عيون": ["محمد مجدي سعده (عيون)"], "مسالك": ["د. علي منتصر (مسالك بولية)"] },
+        "الأربعاء": { "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], "اطفال": ["د. جينا عبدالله الشافعي (اطفال)"], "مسالك": ["د. علي منتصر (مسالك بولية)"] },
+        "الخميس": { "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], "أنف وأذن": ["د. محمد هيكل (أنف وأذن وحنجرة)"], "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], "عظام": ["إبراهيم مطاوع (عظام وعمود فقري)"], "عيون": ["محمد مجدي سعده (عيون)"], "مسالك": ["د. علي منتصر (مسالك بولية)"], "صدر": ["د. أسامة الخشن (اخصائي الصدر - 05:00 عصراً)"] },
+        "الجمعة": { "باطنة ومناظير": ["د. عزيز بدير (باطنة ومناظير)"] }
     };
 
-    window.updateSpecialties = function() {
+    function updateSpecialties() {
         const day = document.getElementById('bDay').value;
         const specSelect = document.getElementById('specialty');
         specSelect.innerHTML = '<option value="">اختر العيادة...</option>';
@@ -172,7 +136,7 @@
         }
     }
 
-    window.updateDoctors = function() {
+    function updateDoctors() {
         const day = document.getElementById('bDay').value;
         const spec = document.getElementById('specialty').value;
         const docSelect = document.getElementById('doctorName');
@@ -182,7 +146,7 @@
         }
     }
 
-    window.resetKimoForm = function() {
+    function resetKimoForm() {
         document.getElementById('booking-form').reset();
     }
 
@@ -192,29 +156,32 @@
         document.getElementById('btn').style.display = 'none';
         document.getElementById('loader').style.display = 'block';
 
-        const formData = new FormData();
-        formData.append('patientName', document.getElementById('pName').value);
-        formData.append('bookingDay', document.getElementById('bDay').value);
-        formData.append('specialty', document.getElementById('specialty').value);
-        formData.append('doctorName', document.getElementById('doctorName').value);
+        const payload = {
+            patientName: document.getElementById('pName').value,
+            bookingDay: document.getElementById('bDay').value,
+            specialty: document.getElementById('specialty').value,
+            doctorName: document.getElementById('doctorName').value
+        };
 
         fetch(scriptURL, {
             method: 'POST',
-            body: formData
+            body: JSON.stringify(payload)
         })
-        .then(response => {
+        .then(res => res.json())
+        .then(data => {
             document.getElementById('loader').style.display = 'none';
             form.style.display = 'none';
-            document.getElementById('res-name').innerText = document.getElementById('pName').value;
             
-            const count = Math.floor(Math.random() * 10) + 1;
-            document.getElementById('b-num').innerText = count;
+            // تحديث رسالة النجاح بالبيانات الحقيقية
+            document.getElementById('res-name').innerText = payload.patientName;
+            document.getElementById('res-doc').innerText = payload.doctorName;
+            document.getElementById('b-num').innerText = data.turn; // رقم الدور من جوجل شيت
             
             document.getElementById('success-msg').style.display = 'block';
         })
         .catch(error => {
-            console.error('Error!', error.message);
-            alert("حدث خطأ أثناء إرسال البيانات، يرجى المحاولة لاًحقاً.");
+            console.error('Error!', error);
+            alert("حدث خطأ أثناء الاتصال بالسيرفر، يرجى المحاولة مرة أخرى.");
             document.getElementById('btn').style.display = 'block';
             document.getElementById('loader').style.display = 'none';
         });
