@@ -37,7 +37,7 @@
 <body>
 
 <div class="news-ticker">
-    <div class="ticker-text">مرحباً بكم في مجمع شبراملس الطبي &nbsp;&nbsp;&nbsp; تم تفعيل نظام الحجز الإلكتروني المحدث</div>
+    <div class="ticker-text">مازالت عروض الإثنين الأبيض مستمرة &nbsp;&nbsp;&nbsp; 50% تخفيضات على جميع التحاليل</div>
 </div>
 
 <div class="main-wrapper">
@@ -48,6 +48,7 @@
             <li>🧪 المعمل متوفر 24 ساعة لخدمتك</li>
             <li>✅ نخبة من الأطباء المتخصصين</li>
             <li>✅ أحدث الأجهزة الطبية</li>
+            <li>✅ رعاية متكاملة طوال الأسبوع</li>
         </ul>
     </div>
 
@@ -91,40 +92,45 @@
             <p>الطبيب: <b id="res-doc"></b></p>
             <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 5px;">يرجى تصوير الشاشة وإظهارها لموظف الاستقبال</p>
             <p>رقم الدور التقريبي: <b id="b-num" style="font-size:45px; display: block; margin: 10px 0;">0</b></p>
+            <p style="color: var(--cancel-color); font-size: 15px; font-weight: bold; margin-bottom: 20px;">سيتم إلغاء الحجز حين انتهاء وقت العيادة</p>
             <button onclick="location.reload()" class="cancel-btn">حجز جديد</button>
         </div>
     </div>
 
     <div class="side-panel">
         <h3>📍 تواصل معنا</h3>
-        <p>شبراملس – امتداد شارع السوق</p>
+        <p style="line-height: 1.6; font-weight: 500;">
+            <strong>العنوان:</strong><br> شبراملس – امتداد شارع السوق - أعلي مسجد عباد الرحمن
+        </p>
+        <hr style="border: 0; border-top: 1px solid #cfd8dc; margin: 15px 0;">
+        <p><strong>للحجز والاستفسار:</strong></p>
         <ul style="list-style:none; padding:0; line-height:2; direction: ltr; text-align: right;">
             <li>01020580002 :واتساب</li>
+            <li>01122593433 📲</li>
             <li>0404650337 📞</li>
+            <li>0404658010 📞</li>
         </ul>
     </div>
 </div>
 
 <script>
+    // الرابط الجديد الخاص بك
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyLf39cWcKOwOgXfE-A51NbXLPnNatwq-22Bm7IGDJvjjINsqkJLWMFtVtjAkDA47jdVQ/exec';
-    let scheduleData = {}; 
 
-    window.onload = function() {
-        fetch(scriptURL)
-        .then(res => res.json())
-        .then(data => {
-            scheduleData = data;
-            console.log("قائمة الأطباء جاهزة");
-        })
-        .catch(err => console.error("خطأ في التحميل:", err));
+    const scheduleData = {
+        "السبت": { "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], "مسالك": ["د. علي منتصر (مسالك بولية)"], "أنف وأذن": ["د. محمد هيكل (أنف وأذن وحنجرة)"], "عيون": ["محمد مجدي سعده (عيون)"] },
+        "الأحد": { "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], "عيون": ["د. خالد أحمد الشيخ (رمد)"], "عظام": ["د.إبراهيم مطاوع (عظام وعمود فقري)"], "مسالك": ["د. علي منتصر (مسالك بولية)"] },
+        "الإثنين": { "نساء": ["د. هيام السمراوي (نساء وتوليد)"], "مخ وأعصاب": ["د. محمد سلام (مخ وأعصاب)"], "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], "مسالك": ["د. علي منتصر (مسالك بولية)"] },
+        "الثلاثاء": { "نفسية": ["د. آلاء الحوت (نفسية وعصبية)"], "أنف وأذن": ["د. سناء الحماقي (أنف وأذن)"], "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], "عظام": ["إبراهيم مطاوع (عظام وعمود فقري)"], "عيون": ["محمد مجدي سعده (عيون)"], "مسالك": ["د. علي منتصر (مسالك بولية)"] },
+        "الأربعاء": { "أسنان": ["د. رنا حمودة (أسنان)", "د. خالد الداهس (أسنان)"], "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], "اطفال": ["د. جينا عبدالله الشافعي (اطفال)"], "مسالك": ["د. علي منتصر (مسالك بولية)"] },
+        "الخميس": { "قلب": ["د. أحمد مسعد الغلبان (قلب وأوعية)"], "أنف وأذن": ["د. محمد هيكل (أنف وأذن وحنجرة)"], "أسنان": ["د. محمد علاء (أسنان)", "د. محمود دهب (أسنان)"], "عظام": ["إبراهيم مطاوع (عظام وعمود فقري)"], "عيون": ["محمد مجدي سعده (عيون)"], "مسالك": ["د. علي منتصر (مسالك بولية)"], "صدر": ["د. أسامة الخشن (اخصائي الصدر - 05:00 عصراً)"] },
+        "الجمعة": { "باطنة ومناظير": ["د. عزيز بدير (باطنة ومناظير)"] }
     };
 
     function updateSpecialties() {
         const day = document.getElementById('bDay').value;
         const specSelect = document.getElementById('specialty');
-        const docSelect = document.getElementById('doctorName');
         specSelect.innerHTML = '<option value="">اختر العيادة...</option>';
-        docSelect.innerHTML = '<option value="">اختر العيادة أولاً...</option>';
         if(day && scheduleData[day]) {
             Object.keys(scheduleData[day]).forEach(s => specSelect.add(new Option(s, s)));
         }
@@ -140,7 +146,9 @@
         }
     }
 
-    function resetKimoForm() { document.getElementById('booking-form').reset(); }
+    function resetKimoForm() {
+        document.getElementById('booking-form').reset();
+    }
 
     const form = document.getElementById('booking-form');
     form.addEventListener('submit', function(e) {
@@ -163,13 +171,17 @@
         .then(data => {
             document.getElementById('loader').style.display = 'none';
             form.style.display = 'none';
+            
+            // تحديث رسالة النجاح بالبيانات الحقيقية
             document.getElementById('res-name').innerText = payload.patientName;
             document.getElementById('res-doc').innerText = payload.doctorName;
-            document.getElementById('b-num').innerText = data.turn;
+            document.getElementById('b-num').innerText = data.turn; // رقم الدور من جوجل شيت
+            
             document.getElementById('success-msg').style.display = 'block';
         })
         .catch(error => {
-            alert("حدث خطأ، يرجى المحاولة لاحقاً.");
+            console.error('Error!', error);
+            alert("حدث خطأ أثناء الاتصال بالسيرفر، يرجى المحاولة مرة أخرى.");
             document.getElementById('btn').style.display = 'block';
             document.getElementById('loader').style.display = 'none';
         });
